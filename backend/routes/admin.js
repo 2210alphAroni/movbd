@@ -57,16 +57,24 @@ router.post('/movies', cpUpload, async (req, res) => {
     if (!req.files?.poster) return res.status(400).json({ message: 'Poster is required' });
 
     const movie = await Movie.create({
-      title, titleBn, description,
-      genre: Array.isArray(genre) ? genre : genre?.split(',').map(g => g.trim()),
-      cast: Array.isArray(cast) ? cast : cast?.split(',').map(c => c.trim()),
-      language, releaseYear: parseInt(releaseYear),
+      title,
+      titleBn,
+      description,
+      genre: Array.isArray(genre)
+        ? genre
+        : genre?.split(",").map((g) => g.trim()),
+      cast: Array.isArray(cast) ? cast : cast?.split(",").map((c) => c.trim()),
+      language,
+      releaseYear: parseInt(releaseYear),
       duration: duration ? parseInt(duration) : undefined,
-      director, country, quality, trailerUrl,
-      poster: `/uploads/posters/${req.files.poster[0].filename}`,
-      backdrop: req.files.backdrop ? `/uploads/posters/${req.files.backdrop[0].filename}` : '',
-      isPublished: isPublished === 'true',
-      isFeatured: isFeatured === 'true'
+      director,
+      country,
+      quality,
+      trailerUrl,
+      poster: req.files.poster[0].path,
+      backdrop: req.files.backdrop ? req.files.backdrop[0].path : "",
+      isPublished: isPublished === "true",
+      isFeatured: isFeatured === "true",
     });
     res.status(201).json(movie);
   } catch (err) {
@@ -86,8 +94,9 @@ router.post('/movies/:id/upload-file', uploadMovie.single('movieFile'), async (r
       ? `${(fileSizeInMB / 1024).toFixed(2)} GB` 
       : `${fileSizeInMB} MB`;
 
-    movie.downloadFile = `/uploads/movies/${req.file.filename}`;
-    movie.fileSize = fileSizeDisplay;
+    movie.downloadFile = req.file.path;
+    movie.fileSize = req.file.size ? `${(req.file.size / (1024 * 1024)).toFixed(1)} MB` : 'Unknown';
+    
     await movie.save();
     res.json({ message: 'File uploaded successfully', fileSize: fileSizeDisplay });
   } catch (err) {
@@ -108,8 +117,8 @@ router.put('/movies/:id', cpUpload, async (req, res) => {
     if (req.body.cast) movie.cast = Array.isArray(req.body.cast) ? req.body.cast : req.body.cast.split(',').map(c => c.trim());
     if (req.body.isPublished !== undefined) movie.isPublished = req.body.isPublished === 'true';
     if (req.body.isFeatured !== undefined) movie.isFeatured = req.body.isFeatured === 'true';
-    if (req.files?.poster) movie.poster = `/uploads/posters/${req.files.poster[0].filename}`;
-    if (req.files?.backdrop) movie.backdrop = `/uploads/posters/${req.files.backdrop[0].filename}`;
+    if (req.files?.poster) movie.poster = req.files.poster[0].path;
+    if (req.files?.backdrop) movie.backdrop = req.files.backdrop[0].path;
 
     await movie.save();
     res.json(movie);
