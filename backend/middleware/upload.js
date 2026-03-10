@@ -54,5 +54,23 @@ const videoStorage = new CloudinaryStorage({
   }),
 });
 
-exports.uploadPoster = multer({ storage: imageStorage });
-exports.uploadMovie = multer({ storage: videoStorage });
+const imageFilter = (req, file, cb) => {
+  const allowed = /jpeg|jpg|png|webp/;
+  if (allowed.test(file.mimetype)) cb(null, true);
+  else cb(new Error('Only images allowed'));
+};
+
+const videoFilter = (req, file, cb) => {
+  const allowed = [
+    "video/mp4",
+    "video/x-matroska",
+    "video/x-msvideo",
+    "video/quicktime",
+  ];
+  if (allowed.includes(file.mimetype)) cb(null, true);
+  else cb(null, true); // সব video accept করো
+};
+
+exports.uploadPoster = multer({ storage: imageStorage, fileFilter: imageFilter });
+exports.uploadMovie = multer({ storage: videoStorage, fileFilter: videoFilter });
+
