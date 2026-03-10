@@ -36,8 +36,8 @@ const Home = () => {
         moviesAPI.getFeatured(),
         moviesAPI.getAll({ limit: 12, sort: 'newest' })
       ]);
-      setFeatured(featuredRes.data);
-      setMovies(moviesRes.data.movies);
+      setFeatured(featuredRes.data || []);
+      setMovies(moviesRes.data.movies || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -65,7 +65,8 @@ const Home = () => {
 
   const hero = featured[heroIndex];
   const heroPoster = hero?.backdrop || hero?.poster;
-  const heroPosterUrl = heroPoster?.startsWith('/uploads') ? `http://localhost:5000${heroPoster}` : heroPoster;
+  const API_URL = import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com';
+  const heroPosterUrl = heroPoster?.startsWith('/uploads') ? `${API_URL}${heroPoster}` : heroPoster;
 
   return (
     <div className="home page-enter">
@@ -119,7 +120,7 @@ const Home = () => {
             <div className="loading-center"><div className="spinner" /></div>
           ) : (
             <div className="movies-grid">
-              {movies.map(movie => (
+              {Array.isArray(movies) && movies.map(movie => (
                 <MovieCard
                   key={movie._id}
                   movie={movie}
