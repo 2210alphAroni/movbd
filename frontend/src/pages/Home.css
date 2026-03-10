@@ -1,0 +1,154 @@
+.home { padding-bottom: 80px; }
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--hero-bg);
+  background-size: cover;
+  background-position: center top;
+  filter: brightness(0.5);
+  transition: all 0.8s ease;
+}
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(10, 10, 15, 0.95) 0%,
+    rgba(10, 10, 15, 0.6) 50%,
+    transparent 100%
+  ),
+  linear-gradient(to top, rgba(10, 10, 15, 1) 0%, transparent 40%);
+}
+.hero-content { position: relative; z-index: 1; padding-bottom: 80px; padding-top: 120px; }
+.hero-text { max-width: 600px; }
+.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  letter-spacing: 3px;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 2px 4px 20px rgba(0,0,0,0.5);
+}
+.hero-title-bn {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+.hero-meta .gold { color: var(--gold); vertical-align: middle; margin-right: 4px; }
+.hero-desc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 32px;
+  max-width: 480px;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-dots {
+  position: absolute;
+  bottom: 32px; right: 32px;
+  display: flex; gap: 8px; z-index: 2;
+}
+.dot-btn {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  border: none;
+  transition: all var(--transition);
+}
+.dot-btn.active { background: var(--accent); width: 24px; border-radius: 4px; }
+
+/* Movies Section */
+.movies-section { padding: 60px 0 40px; }
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 32px;
+}
+.see-all {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 0.88rem; font-weight: 500;
+  color: var(--accent);
+  transition: gap var(--transition);
+}
+.see-all:hover { gap: 8px; }
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+.browse-more {
+  display: flex; justify-content: center;
+  margin-top: 40px;
+}
+
+/* Genre Section */
+.genre-section { padding: 40px 0; }
+.genre-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+.genre-card {
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  transition: all 0.2s ease;
+  animation: fadeUp 0.4s ease both;
+  animation-delay: var(--delay);
+}
+.genre-card:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+.genre-name { font-weight: 600; font-size: 0.9rem; }
+
+/* Stats Banner */
+.stats-banner {
+  padding: 60px 0;
+  background: linear-gradient(135deg, #12121a 0%, #1a1a2e 100%);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-top: 40px;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  text-align: center;
+}
+.stat-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+}
+.stat-icon { font-size: 2rem; color: var(--accent); margin-bottom: 4px; }
+.stat-item strong { font-size: 1.1rem; }
+.stat-item span { color: var(--text-muted); font-size: 0.85rem; }
+
+@media (max-width: 768px) {
+  .movies-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .stats-grid { grid-template-columns: 1fr; gap: 24px; }
+  .hero-content { padding-bottom: 60px; padding-top: 80px; }
+}

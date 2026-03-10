@@ -1,0 +1,11 @@
+node_modules/
+.env
+uploads/movies/*
+!uploads/movies/.gitkeep
+uploads/posters/*
+!uploads/posters/.gitkeep
+build/
+.DS_Store
+backend/uploads/movies/*
+backend/uploads/posters/*
+node_modules/
