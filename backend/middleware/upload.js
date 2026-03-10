@@ -54,18 +54,5 @@ const videoStorage = new CloudinaryStorage({
   }),
 });
 
-const imageFilter = (req, file, cb) => {
-  const allowed = /jpeg|jpg|png|webp/;
-  if (allowed.test(file.mimetype)) cb(null, true);
-  else cb(new Error('Only images allowed'));
-};
-
-const videoFilter = (req, file, cb) => {
-  const allowed = /mp4|mkv|avi|mov/;
-  if (allowed.test(file.mimetype.split('/')[1])) cb(null, true);
-  else cb(new Error('Only video files allowed'));
-};
-
-exports.uploadPoster = multer({ storage: imageStorage, fileFilter: imageFilter });
-exports.uploadMovie = multer({ storage: videoStorage, fileFilter: videoFilter });
-
+exports.uploadPoster = multer({ storage: imageStorage });
+exports.uploadMovie = multer({ storage: videoStorage });
