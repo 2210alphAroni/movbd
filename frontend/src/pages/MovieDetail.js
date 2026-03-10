@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { moviesAPI, reviewsAPI, watchlistAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
-import { FiStar, FiDownload, FiBookmark, FiPlay, FiClock, FiCalendar, FiGlobe, FiUser, FiTrash2 } from 'react-icons/fi';
+import { FiStar, FiBookmark, FiPlay, FiClock, FiCalendar, FiGlobe, FiUser, FiTrash2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import './MovieDetail.css';
 
@@ -14,7 +14,6 @@ const MovieDetail = () => {
   const [reviews, setReviews] = useState([]);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [downloading, setDownloading] = useState(false);
   const [showTrailer, setShowTrailer] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 8, comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
@@ -47,62 +46,6 @@ const MovieDetail = () => {
     } catch (err) {}
   };
 
-  const handleDownload = async () => {
-  if (!user) { toast.error('Please login to download'); navigate('/login'); return; }
-  setDownloading(true);
-  
-  const toastId = toast.loading('Starting download...', { duration: Infinity });
-  
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}/api/movies/${id}/download`,
-      { headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('movbd_user'))?.token}` } }
-    );
-
-    if (!response.ok) throw new Error('Download failed');
-
-    const contentLength = response.headers.get('content-length');
-    const total = parseInt(contentLength, 10);
-    let loaded = 0;
-
-    const reader = response.body.getReader();
-    const chunks = [];
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      loaded += value.length;
-
-      if (total) {
-        const percent = Math.round((loaded / total) * 100);
-        toast.loading(`Downloading... ${percent}%`, { id: toastId, duration: Infinity });
-      } else {
-        const mb = (loaded / 1024 / 1024).toFixed(1);
-        toast.loading(`Downloading... ${mb} MB`, { id: toastId, duration: Infinity });
-      }
-    }
-
-    const blob = new Blob(chunks);
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${movie.title}.mp4`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
-
-    toast.success('Download complete! ✅', { id: toastId, duration: 4000 });
-    setMovie(prev => ({ ...prev, downloadCount: prev.downloadCount + 1 }));
-
-  } catch (err) {
-    toast.error('Download failed. File may not be available.', { id: toastId, duration: 4000 });
-  } finally {
-    setDownloading(false);
-  }
-};
-
   const handleWatchlist = async () => {
     if (!user) { toast.error('Please login'); navigate('/login'); return; }
     try {
@@ -121,7 +64,7 @@ const MovieDetail = () => {
       setReviews(prev => [res.data, ...prev]);
       setReviewForm({ rating: 8, comment: '' });
       toast.success('Review posted!');
-      fetchMovie(); // update average rating
+      fetchMovie();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to post review');
     } finally { setSubmittingReview(false); }
@@ -140,11 +83,11 @@ const MovieDetail = () => {
   if (!movie) return null;
 
   const posterUrl = movie.poster?.startsWith('/uploads') 
-  ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.poster}` 
-  : movie.poster;
+    ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.poster}` 
+    : movie.poster;
   const backdropUrl = movie.backdrop?.startsWith('/uploads') 
-  ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.backdrop}` 
-  : movie.backdrop;
+    ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.backdrop}` 
+    : movie.backdrop;
 
   return (
     <div className="movie-detail page-enter">
@@ -163,9 +106,6 @@ const MovieDetail = () => {
                   <FiPlay /> Watch Trailer
                 </button>
               )}
-              <button onClick={handleDownload} disabled={downloading} className="btn btn-outline btn-lg">
-                <FiDownload /> {downloading ? 'Downloading...' : `Download ${movie.fileSize ? `(${movie.fileSize})` : ''}`}
-              </button>
               <button onClick={handleWatchlist} className={`btn btn-lg ${inWatchlist ? 'btn-primary' : 'btn-ghost'}`}>
                 <FiBookmark /> {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
               </button>
@@ -188,10 +128,6 @@ const MovieDetail = () => {
                   <strong>{movie.averageRating > 0 ? movie.averageRating.toFixed(1) : 'N/A'}</strong>
                   <span>{movie.totalReviews} reviews</span>
                 </div>
-              </div>
-              <div className="stat-box">
-                <FiDownload />
-                <div><strong>{movie.downloadCount}</strong><span>downloads</span></div>
               </div>
             </div>
 
@@ -223,7 +159,6 @@ const MovieDetail = () => {
         <section className="reviews-section">
           <h2 className="section-title">Reviews & Ratings</h2>
 
-          {/* Review Form */}
           {user && (
             <form onSubmit={handleReviewSubmit} className="review-form">
               <h3>Write a Review</h3>
@@ -250,7 +185,6 @@ const MovieDetail = () => {
             </form>
           )}
 
-          {/* Reviews List */}
           <div className="reviews-list">
             {reviews.length === 0 ? (
               <p className="no-reviews">No reviews yet. Be the first to review!</p>
@@ -283,7 +217,6 @@ const MovieDetail = () => {
         </section>
       </div>
 
-      {/* Trailer Modal */}
       {showTrailer && (
         <div className="trailer-modal" onClick={() => setShowTrailer(false)}>
           <div className="trailer-content" onClick={e => e.stopPropagation()}>
