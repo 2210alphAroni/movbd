@@ -5,7 +5,7 @@ import './MovieCard.css';
 
 const MovieCard = ({ movie, onWatchlistToggle, inWatchlist }) => {
   const posterUrl = movie.poster?.startsWith('/uploads')
-    ? `http://localhost:5000${movie.poster}`
+    ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.poster}`
     : movie.poster || 'https://via.placeholder.com/300x450/16161f/666?text=No+Poster';
 
   return (
