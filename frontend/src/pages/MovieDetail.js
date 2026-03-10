@@ -48,23 +48,60 @@ const MovieDetail = () => {
   };
 
   const handleDownload = async () => {
-    if (!user) { toast.error('Please login to download'); navigate('/login'); return; }
-    setDownloading(true);
-    try {
-      const res = await moviesAPI.download(id);
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${movie.title}.mp4`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      toast.success('Download started!');
-      setMovie(prev => ({ ...prev, downloadCount: prev.downloadCount + 1 }));
-    } catch (err) {
-      toast.error('Download failed. File may not be available.');
-    } finally { setDownloading(false); }
-  };
+  if (!user) { toast.error('Please login to download'); navigate('/login'); return; }
+  setDownloading(true);
+  
+  const toastId = toast.loading('Starting download...', { duration: Infinity });
+  
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}/api/movies/${id}/download`,
+      { headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem('movbd_user'))?.token}` } }
+    );
+
+    if (!response.ok) throw new Error('Download failed');
+
+    const contentLength = response.headers.get('content-length');
+    const total = parseInt(contentLength, 10);
+    let loaded = 0;
+
+    const reader = response.body.getReader();
+    const chunks = [];
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      loaded += value.length;
+
+      if (total) {
+        const percent = Math.round((loaded / total) * 100);
+        toast.loading(`Downloading... ${percent}%`, { id: toastId, duration: Infinity });
+      } else {
+        const mb = (loaded / 1024 / 1024).toFixed(1);
+        toast.loading(`Downloading... ${mb} MB`, { id: toastId, duration: Infinity });
+      }
+    }
+
+    const blob = new Blob(chunks);
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${movie.title}.mp4`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    toast.success('Download complete! ✅', { id: toastId, duration: 4000 });
+    setMovie(prev => ({ ...prev, downloadCount: prev.downloadCount + 1 }));
+
+  } catch (err) {
+    toast.error('Download failed. File may not be available.', { id: toastId, duration: 4000 });
+  } finally {
+    setDownloading(false);
+  }
+};
 
   const handleWatchlist = async () => {
     if (!user) { toast.error('Please login'); navigate('/login'); return; }
