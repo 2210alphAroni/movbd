@@ -102,8 +102,12 @@ const MovieDetail = () => {
   if (loading) return <div className="loading-center" style={{minHeight:'100vh'}}><div className="spinner" /></div>;
   if (!movie) return null;
 
-  const posterUrl = movie.poster?.startsWith('/uploads') ? `http://localhost:5000${movie.poster}` : movie.poster;
-  const backdropUrl = movie.backdrop?.startsWith('/uploads') ? `http://localhost:5000${movie.backdrop}` : movie.backdrop;
+  const posterUrl = movie.poster?.startsWith('/uploads') 
+  ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.poster}` 
+  : movie.poster;
+  const backdropUrl = movie.backdrop?.startsWith('/uploads') 
+  ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.backdrop}` 
+  : movie.backdrop;
 
   return (
     <div className="movie-detail page-enter">
