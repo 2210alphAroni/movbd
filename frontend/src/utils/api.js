@@ -1,7 +1,5 @@
 import axios from 'axios';
-
 const API = axios.create({ baseURL: `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}/api` });
-
 // Every request এ automatically token attach করবে
 API.interceptors.request.use((config) => {
   const user = localStorage.getItem('movbd_user');
