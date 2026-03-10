@@ -48,7 +48,7 @@ const Home = () => {
   const fetchWatchlist = async () => {
     try {
       const res = await watchlistAPI.get();
-      setWatchlist(res.data.map(m => m._id));
+      setWatchlist((res.data || []).map(m => m._id));
     } catch (err) {}
   };
 
