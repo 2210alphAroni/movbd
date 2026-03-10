@@ -25,7 +25,8 @@ router.get('/stats', async (req, res) => {
       totalDownloads: totalDownloads[0]?.total || 0
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error:", err);
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
   }
 });
 
@@ -40,7 +41,8 @@ router.get('/movies', async (req, res) => {
     const total = await Movie.countDocuments();
     res.json({ movies, total, pages: Math.ceil(total / limit) });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error:", err);
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
   }
 });
 
@@ -78,7 +80,8 @@ router.post('/movies', cpUpload, async (req, res) => {
     });
     res.status(201).json(movie);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error:", err);
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
   }
 });
 
@@ -100,7 +103,8 @@ router.post('/movies/:id/upload-file', uploadMovie.single('movieFile'), async (r
     await movie.save();
     res.json({ message: 'File uploaded successfully', fileSize: fileSizeDisplay });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error:", err);
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
   }
 });
 
@@ -123,7 +127,8 @@ router.put('/movies/:id', cpUpload, async (req, res) => {
     await movie.save();
     res.json(movie);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error:", err);
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
   }
 });
 
@@ -135,7 +140,8 @@ router.delete('/movies/:id', async (req, res) => {
     await Review.deleteMany({ movie: req.params.id });
     res.json({ message: 'Movie deleted successfully' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error:", err);
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
   }
 });
 
@@ -145,7 +151,8 @@ router.get('/users', async (req, res) => {
     const users = await User.find({ role: 'user' }).select('-password').sort({ createdAt: -1 });
     res.json(users);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error:", err);
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
   }
 });
 
@@ -155,7 +162,8 @@ router.delete('/users/:id', async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
     res.json({ message: 'User deleted' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error:", err);
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
   }
 });
 
@@ -165,7 +173,8 @@ router.delete('/reviews/:id', async (req, res) => {
     await Review.findByIdAndDelete(req.params.id);
     res.json({ message: 'Review deleted' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error:", err);
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
   }
 });
 
