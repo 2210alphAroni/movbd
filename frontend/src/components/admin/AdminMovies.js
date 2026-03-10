@@ -81,7 +81,7 @@ const AdminMovies = () => {
               <tr key={movie._id}>
                 <td>
                   <div className="table-movie">
-                    <img src={movie.poster?.startsWith('/uploads') ? `http://localhost:5000${movie.poster}` : movie.poster} alt={movie.title} />
+                    <img src={movie.poster?.startsWith('/uploads') ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.poster}` : movie.poster} alt={movie.title} />
                     <div>
                       <strong>{movie.title}</strong>
                       <small>{movie.genre?.join(', ')}</small>
