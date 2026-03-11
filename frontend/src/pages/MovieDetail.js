@@ -92,7 +92,10 @@ const MovieDetail = () => {
 
   return (
     <div className="movie-detail page-enter">
-      <div className="detail-backdrop" style={{ backgroundImage: `url(${backdropUrl || posterUrl})` }} />
+      <div
+        className="detail-backdrop"
+        style={{ backgroundImage: `url(${backdropUrl || posterUrl})` }}
+      />
       <div className="detail-overlay" />
 
       <div className="container detail-content">
@@ -101,17 +104,34 @@ const MovieDetail = () => {
             <img src={posterUrl} alt={movie.title} />
             <div className="poster-actions">
               {movie.movieUrl && (
-                <button onClick={() => setShowMovie(true)} className="btn btn-primary btn-lg">
+                <button
+                  onClick={() => {
+                    if (!user) {
+                      toast.error("Please login to watch");
+                      navigate("/login");
+                      return;
+                    }
+                    setShowMovie(true);
+                  }}
+                  className="btn btn-primary btn-lg"
+                >
                   <FiFilm /> Watch Movie
                 </button>
               )}
               {movie.trailerUrl && (
-                <button onClick={() => setShowTrailer(true)} className="btn btn-outline btn-lg">
+                <button
+                  onClick={() => setShowTrailer(true)}
+                  className="btn btn-outline btn-lg"
+                >
                   <FiPlay /> Watch Trailer
                 </button>
               )}
-              <button onClick={handleWatchlist} className={`btn btn-lg ${inWatchlist ? 'btn-primary' : 'btn-ghost'}`}>
-                <FiBookmark /> {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
+              <button
+                onClick={handleWatchlist}
+                className={`btn btn-lg ${inWatchlist ? "btn-primary" : "btn-ghost"}`}
+              >
+                <FiBookmark />{" "}
+                {inWatchlist ? "In Watchlist" : "Add to Watchlist"}
               </button>
             </div>
           </div>
@@ -119,34 +139,75 @@ const MovieDetail = () => {
           <div className="detail-info">
             <div className="detail-badges">
               <span className="badge badge-accent">{movie.quality}</span>
-              {movie.genre?.map(g => <span key={g} className="badge badge-dark">{g}</span>)}
+              {movie.genre?.map((g) => (
+                <span key={g} className="badge badge-dark">
+                  {g}
+                </span>
+              ))}
             </div>
             <h1 className="detail-title">{movie.title}</h1>
-            {movie.titleBn && <p className="detail-title-bn">{movie.titleBn}</p>}
+            {movie.titleBn && (
+              <p className="detail-title-bn">{movie.titleBn}</p>
+            )}
 
             <div className="detail-stats">
               <div className="stat-box">
                 <FiStar className="gold" />
                 <div>
-                  <strong>{movie.averageRating > 0 ? movie.averageRating.toFixed(1) : 'N/A'}</strong>
+                  <strong>
+                    {movie.averageRating > 0
+                      ? movie.averageRating.toFixed(1)
+                      : "N/A"}
+                  </strong>
                   <span>{movie.totalReviews} reviews</span>
                 </div>
               </div>
             </div>
 
             <div className="detail-meta-grid">
-              {movie.releaseYear && <div className="meta-item"><FiCalendar /><span>{movie.releaseYear}</span></div>}
-              {movie.duration && <div className="meta-item"><FiClock /><span>{Math.floor(movie.duration/60)}h {movie.duration%60}m</span></div>}
-              {movie.language && <div className="meta-item"><FiGlobe /><span>{movie.language}</span></div>}
-              {movie.country && <div className="meta-item"><FiGlobe /><span>{movie.country}</span></div>}
-              {movie.director && <div className="meta-item"><FiUser /><span>Dir: {movie.director}</span></div>}
+              {movie.releaseYear && (
+                <div className="meta-item">
+                  <FiCalendar />
+                  <span>{movie.releaseYear}</span>
+                </div>
+              )}
+              {movie.duration && (
+                <div className="meta-item">
+                  <FiClock />
+                  <span>
+                    {Math.floor(movie.duration / 60)}h {movie.duration % 60}m
+                  </span>
+                </div>
+              )}
+              {movie.language && (
+                <div className="meta-item">
+                  <FiGlobe />
+                  <span>{movie.language}</span>
+                </div>
+              )}
+              {movie.country && (
+                <div className="meta-item">
+                  <FiGlobe />
+                  <span>{movie.country}</span>
+                </div>
+              )}
+              {movie.director && (
+                <div className="meta-item">
+                  <FiUser />
+                  <span>Dir: {movie.director}</span>
+                </div>
+              )}
             </div>
 
             {movie.cast?.length > 0 && (
               <div className="detail-cast">
                 <h4>Cast</h4>
                 <div className="cast-list">
-                  {movie.cast.map(c => <span key={c} className="cast-tag">{c}</span>)}
+                  {movie.cast.map((c) => (
+                    <span key={c} className="cast-tag">
+                      {c}
+                    </span>
+                  ))}
                 </div>
               </div>
             )}
@@ -164,11 +225,21 @@ const MovieDetail = () => {
             <form onSubmit={handleReviewSubmit} className="review-form">
               <h3>Write a Review</h3>
               <div className="rating-input">
-                <label>Your Rating: <strong>{reviewForm.rating}/10</strong></label>
+                <label>
+                  Your Rating: <strong>{reviewForm.rating}/10</strong>
+                </label>
                 <input
-                  type="range" min="1" max="10" step="0.5"
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="0.5"
                   value={reviewForm.rating}
-                  onChange={e => setReviewForm(prev => ({ ...prev, rating: parseFloat(e.target.value) }))}
+                  onChange={(e) =>
+                    setReviewForm((prev) => ({
+                      ...prev,
+                      rating: parseFloat(e.target.value),
+                    }))
+                  }
                   className="rating-slider"
                 />
               </div>
@@ -176,35 +247,54 @@ const MovieDetail = () => {
                 className="form-control"
                 placeholder="Share your thoughts about this movie..."
                 value={reviewForm.comment}
-                onChange={e => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
+                onChange={(e) =>
+                  setReviewForm((prev) => ({
+                    ...prev,
+                    comment: e.target.value,
+                  }))
+                }
                 rows={4}
                 required
               />
-              <button type="submit" disabled={submittingReview} className="btn btn-primary">
-                {submittingReview ? 'Posting...' : 'Post Review'}
+              <button
+                type="submit"
+                disabled={submittingReview}
+                className="btn btn-primary"
+              >
+                {submittingReview ? "Posting..." : "Post Review"}
               </button>
             </form>
           )}
 
           <div className="reviews-list">
             {reviews.length === 0 ? (
-              <p className="no-reviews">No reviews yet. Be the first to review!</p>
+              <p className="no-reviews">
+                No reviews yet. Be the first to review!
+              </p>
             ) : (
-              reviews.map(review => (
+              reviews.map((review) => (
                 <div key={review._id} className="review-card">
                   <div className="review-header">
                     <div className="review-user">
-                      <div className="review-avatar">{review.user?.name?.charAt(0).toUpperCase()}</div>
+                      <div className="review-avatar">
+                        {review.user?.name?.charAt(0).toUpperCase()}
+                      </div>
                       <div>
                         <strong>{review.user?.name}</strong>
-                        <span>{new Date(review.createdAt).toLocaleDateString()}</span>
+                        <span>
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
                     <div className="review-rating">
                       <FiStar className="gold" />
                       <strong>{review.rating}/10</strong>
-                      {(user?._id === review.user?._id || user?.role === 'admin') && (
-                        <button onClick={() => handleDeleteReview(review._id)} className="delete-btn">
+                      {(user?._id === review.user?._id ||
+                        user?.role === "admin") && (
+                        <button
+                          onClick={() => handleDeleteReview(review._id)}
+                          className="delete-btn"
+                        >
                           <FiTrash2 />
                         </button>
                       )}
@@ -221,8 +311,13 @@ const MovieDetail = () => {
       {/* Watch Movie Modal */}
       {showMovie && (
         <div className="trailer-modal" onClick={() => setShowMovie(false)}>
-          <div className="trailer-content" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowMovie(false)} className="close-trailer">✕</button>
+          <div className="trailer-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowMovie(false)}
+              className="close-trailer"
+            >
+              ✕
+            </button>
             <iframe
               src={movie.movieUrl}
               title="Movie"
@@ -237,8 +332,13 @@ const MovieDetail = () => {
       {/* Trailer Modal */}
       {showTrailer && (
         <div className="trailer-modal" onClick={() => setShowTrailer(false)}>
-          <div className="trailer-content" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowTrailer(false)} className="close-trailer">✕</button>
+          <div className="trailer-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowTrailer(false)}
+              className="close-trailer"
+            >
+              ✕
+            </button>
             <iframe
               src={movie.trailerUrl}
               title="Trailer"
