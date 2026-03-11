@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { uploadPoster } = require('../middleware/upload');
 
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
@@ -11,10 +12,8 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) return res.status(400).json({ message: 'All fields required' });
-    
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: 'Email already registered' });
-
     const user = await User.create({ name, email, password });
     res.status(201).json({
       _id: user._id, name: user.name, email: user.email,
@@ -32,7 +31,6 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ email });
     if (!user || !(await user.matchPassword(password)))
       return res.status(401).json({ message: 'Invalid email or password' });
-
     res.json({
       _id: user._id, name: user.name, email: user.email,
       role: user.role, avatar: user.avatar, token: generateToken(user._id)
@@ -49,13 +47,18 @@ router.get('/me', protect, async (req, res) => {
 });
 
 // @PUT /api/auth/profile
-router.put('/profile', protect, async (req, res) => {
+router.put('/profile', protect, uploadPoster.single('avatar'), async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (req.body.name) user.name = req.body.name;
+    if (req.body.email) user.email = req.body.email;
     if (req.body.password) user.password = req.body.password;
+    if (req.file) user.avatar = req.file.path;
     const updated = await user.save();
-    res.json({ _id: updated._id, name: updated.name, email: updated.email, role: updated.role });
+    res.json({
+      _id: updated._id, name: updated.name, email: updated.email,
+      role: updated.role, avatar: updated.avatar, token: generateToken(updated._id)
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 const API = axios.create({ baseURL: `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}/api` });
-// Every request এ automatically token attach করবে
+
 API.interceptors.request.use((config) => {
   const user = localStorage.getItem('movbd_user');
   if (user) {
@@ -14,7 +14,9 @@ export const authAPI = {
   register: (data) => API.post('/auth/register', data),
   login: (data) => API.post('/auth/login', data),
   getMe: () => API.get('/auth/me'),
-  updateProfile: (data) => API.put('/auth/profile', data),
+  updateProfile: (data) => API.put('/auth/profile', data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
 };
 
 export const moviesAPI = {

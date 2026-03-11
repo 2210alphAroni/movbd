@@ -19,7 +19,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => { setMenuOpen(false); }, [location]);
+  useEffect(() => { setMenuOpen(false); setDropdownOpen(false); }, [location]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -57,7 +57,12 @@ const Navbar = () => {
 
           {user ? (
             <div className="user-menu" onClick={() => setDropdownOpen(!dropdownOpen)}>
-              <div className="user-avatar">{user.name?.charAt(0).toUpperCase()}</div>
+              <div className="user-avatar">
+                {user.avatar
+                  ? <img src={user.avatar} alt={user.name} style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'50%'}} />
+                  : user.name?.charAt(0).toUpperCase()
+                }
+              </div>
               {dropdownOpen && (
                 <div className="dropdown">
                   <div className="dropdown-header">
