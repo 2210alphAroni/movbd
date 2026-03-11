@@ -43,12 +43,12 @@ const MovieCard = ({ movie, onWatchlistToggle, inWatchlist }) => {
             <FiStar className="star" />
             <span>{movie.averageRating > 0 ? movie.averageRating.toFixed(1) : 'N/A'}</span>
           </div>
-          {movie.downloadCount > 0 && (
+          {/* {movie.downloadCount > 0 && (
             <div className="card-downloads">
               <FiDownload />
               <span>{movie.downloadCount}</span>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>
