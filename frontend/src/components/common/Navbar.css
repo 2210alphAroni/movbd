@@ -91,7 +91,7 @@
 .user-avatar {
   width: 36px; height: 36px;
   border-radius: 50%;
-  background: var(--accent);
+  /* background: var(--accent); */
   display: flex; align-items: center; justify-content: center;
   font-weight: 700; font-size: 0.9rem;
   border: 2px solid transparent;
