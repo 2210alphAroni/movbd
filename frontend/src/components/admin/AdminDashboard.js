@@ -79,7 +79,7 @@ const AdminDashboard = () => {
                 <StatCard icon={<FiFilm />} label="Total Movies" value={stats?.totalMovies} color="#e50914" />
                 <StatCard icon={<FiTrendingUp />} label="Published" value={stats?.published} color="#22c55e" />
                 <StatCard icon={<FiUsers />} label="Users" value={stats?.totalUsers} color="#3b82f6" />
-                <StatCard icon={<FiDownload />} label="Total Downloads" value={stats?.totalDownloads} color="#f59e0b" />
+                {/* <StatCard icon={<FiDownload />} label="Total Downloads" value={stats?.totalDownloads} color="#f59e0b" /> */}
                 <StatCard icon={<FiStar />} label="Reviews" value={stats?.totalReviews} color="#8b5cf6" />
               </div>
               <div className="admin-quick-actions">

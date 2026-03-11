@@ -6,8 +6,13 @@ const Footer = () => (
   <footer className="footer">
     <div className="container footer-content">
       <div className="footer-brand">
-        <div className="footer-logo">MOV<span>BD</span></div>
-        <p>Bangladesh's premier platform for watching and downloading movies. All genres, all languages, completely free.</p>
+        <div className="footer-logo">
+          MOV<span>BD</span>
+        </div>
+        <p>
+          Bangladesh's premier platform for watching and reviewing movies. All
+          genres, all languages, completely free.
+        </p>
       </div>
       <div className="footer-links">
         <div>
@@ -27,7 +32,17 @@ const Footer = () => (
       </div>
     </div>
     <div className="footer-bottom">
-      <p>© {new Date().getFullYear()} MovBD. Built with MERN Stack.</p>
+      <p>© {new Date().getFullYear()} MovBD • MERN Stack</p>
+      <small>
+        Developed by
+        <a
+          href="https://roniportfolio.onrender.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Nabinur Islam Roni
+        </a>
+      </small>
     </div>
   </footer>
 );

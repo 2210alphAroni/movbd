@@ -15,6 +15,7 @@ const movieSchema = new mongoose.Schema({
   poster: { type: String, required: true },
   backdrop: { type: String, default: '' },
   trailerUrl: { type: String, default: '' },
+  movieUrl: { type: String, default: '' },
   downloadFile: { type: String, default: '' },
   fileSize: { type: String, default: '' },
   isPublished: { type: Boolean, default: false },
@@ -25,8 +26,6 @@ const movieSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-// language_override: 'nolang' দিলে MongoDB আর language field কে
-// text index language হিসেবে ব্যবহার করবে না
 movieSchema.index(
   { title: 'text', description: 'text', director: 'text' },
   { default_language: 'none', language_override: 'nolang' }

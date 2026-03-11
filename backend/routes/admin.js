@@ -54,7 +54,7 @@ const cpUpload = (req, res, next) => {
 
 router.post('/movies', cpUpload, async (req, res) => {
   try {
-    const { title, titleBn, description, genre, language, releaseYear, duration, director, cast, country, quality, trailerUrl, isPublished, isFeatured } = req.body;
+    const { title, titleBn, description, genre, language, releaseYear, duration, director, cast, country, quality, trailerUrl, movieUrl, isPublished, isFeatured } = req.body;
 
     if (!req.files?.poster) return res.status(400).json({ message: 'Poster is required' });
 
@@ -62,9 +62,7 @@ router.post('/movies', cpUpload, async (req, res) => {
       title,
       titleBn,
       description,
-      genre: Array.isArray(genre)
-        ? genre
-        : genre?.split(",").map((g) => g.trim()),
+      genre: Array.isArray(genre) ? genre : genre?.split(",").map((g) => g.trim()),
       cast: Array.isArray(cast) ? cast : cast?.split(",").map((c) => c.trim()),
       language,
       releaseYear: parseInt(releaseYear),
@@ -73,6 +71,7 @@ router.post('/movies', cpUpload, async (req, res) => {
       country,
       quality,
       trailerUrl,
+      movieUrl,
       poster: req.files.poster[0].path,
       backdrop: req.files.backdrop ? req.files.backdrop[0].path : "",
       isPublished: isPublished === "true",
@@ -93,13 +92,13 @@ router.post('/movies/:id/upload-file', uploadMovie.single('movieFile'), async (r
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
     const fileSizeInMB = (req.file.size / (1024 * 1024)).toFixed(1);
-    const fileSizeDisplay = fileSizeInMB > 1024 
-      ? `${(fileSizeInMB / 1024).toFixed(2)} GB` 
+    const fileSizeDisplay = fileSizeInMB > 1024
+      ? `${(fileSizeInMB / 1024).toFixed(2)} GB`
       : `${fileSizeInMB} MB`;
 
     movie.downloadFile = req.file.path;
     movie.fileSize = req.file.size ? `${(req.file.size / (1024 * 1024)).toFixed(1)} MB` : 'Unknown';
-    
+
     await movie.save();
     res.json({ message: 'File uploaded successfully', fileSize: fileSizeDisplay });
   } catch (err) {
@@ -114,7 +113,7 @@ router.put('/movies/:id', cpUpload, async (req, res) => {
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).json({ message: 'Movie not found' });
 
-    const fields = ['title', 'titleBn', 'description', 'language', 'releaseYear', 'duration', 'director', 'country', 'quality', 'trailerUrl'];
+    const fields = ['title', 'titleBn', 'description', 'language', 'releaseYear', 'duration', 'director', 'country', 'quality', 'trailerUrl', 'movieUrl'];
     fields.forEach(f => { if (req.body[f] !== undefined) movie[f] = req.body[f]; });
 
     if (req.body.genre) movie.genre = Array.isArray(req.body.genre) ? req.body.genre : req.body.genre.split(',').map(g => g.trim());

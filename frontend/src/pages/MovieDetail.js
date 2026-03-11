@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { moviesAPI, reviewsAPI, watchlistAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
-import { FiStar, FiBookmark, FiPlay, FiClock, FiCalendar, FiGlobe, FiUser, FiTrash2 } from 'react-icons/fi';
+import { FiStar, FiBookmark, FiPlay, FiFilm, FiClock, FiCalendar, FiGlobe, FiUser, FiTrash2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import './MovieDetail.css';
 
@@ -15,6 +15,7 @@ const MovieDetail = () => {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
+  const [showMovie, setShowMovie] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 8, comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
 
@@ -82,27 +83,30 @@ const MovieDetail = () => {
   if (loading) return <div className="loading-center" style={{minHeight:'100vh'}}><div className="spinner" /></div>;
   if (!movie) return null;
 
-  const posterUrl = movie.poster?.startsWith('/uploads') 
-    ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.poster}` 
+  const posterUrl = movie.poster?.startsWith('/uploads')
+    ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.poster}`
     : movie.poster;
-  const backdropUrl = movie.backdrop?.startsWith('/uploads') 
-    ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.backdrop}` 
+  const backdropUrl = movie.backdrop?.startsWith('/uploads')
+    ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.backdrop}`
     : movie.backdrop;
 
   return (
     <div className="movie-detail page-enter">
-      {/* Backdrop */}
       <div className="detail-backdrop" style={{ backgroundImage: `url(${backdropUrl || posterUrl})` }} />
       <div className="detail-overlay" />
 
       <div className="container detail-content">
         <div className="detail-grid">
-          {/* Poster */}
           <div className="detail-poster">
             <img src={posterUrl} alt={movie.title} />
             <div className="poster-actions">
+              {movie.movieUrl && (
+                <button onClick={() => setShowMovie(true)} className="btn btn-primary btn-lg">
+                  <FiFilm /> Watch Movie
+                </button>
+              )}
               {movie.trailerUrl && (
-                <button onClick={() => setShowTrailer(true)} className="btn btn-primary btn-lg">
+                <button onClick={() => setShowTrailer(true)} className="btn btn-outline btn-lg">
                   <FiPlay /> Watch Trailer
                 </button>
               )}
@@ -112,7 +116,6 @@ const MovieDetail = () => {
             </div>
           </div>
 
-          {/* Info */}
           <div className="detail-info">
             <div className="detail-badges">
               <span className="badge badge-accent">{movie.quality}</span>
@@ -155,10 +158,8 @@ const MovieDetail = () => {
           </div>
         </div>
 
-        {/* Reviews Section */}
         <section className="reviews-section">
           <h2 className="section-title">Reviews & Ratings</h2>
-
           {user && (
             <form onSubmit={handleReviewSubmit} className="review-form">
               <h3>Write a Review</h3>
@@ -217,6 +218,23 @@ const MovieDetail = () => {
         </section>
       </div>
 
+      {/* Watch Movie Modal */}
+      {showMovie && (
+        <div className="trailer-modal" onClick={() => setShowMovie(false)}>
+          <div className="trailer-content" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowMovie(false)} className="close-trailer">✕</button>
+            <iframe
+              src={movie.movieUrl}
+              title="Movie"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Trailer Modal */}
       {showTrailer && (
         <div className="trailer-modal" onClick={() => setShowTrailer(false)}>
           <div className="trailer-content" onClick={e => e.stopPropagation()}>

@@ -12,7 +12,7 @@ const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest First' },
   { value: 'oldest', label: 'Oldest First' },
   { value: 'rating', label: 'Top Rated' },
-  { value: 'popular', label: 'Most Downloaded' },
+  // { value: 'popular', label: 'Most Downloaded' },
   { value: 'year', label: 'Release Year' },
 ];
 
