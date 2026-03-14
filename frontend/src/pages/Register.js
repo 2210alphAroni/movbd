@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import './Auth.css';
 
 const Register = () => {
@@ -10,6 +11,8 @@ const Register = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,11 +46,35 @@ const Register = () => {
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input type="password" className="form-control" placeholder="Min 6 characters" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="form-control"
+                placeholder="Min 6 characters"
+                value={form.password}
+                onChange={e => setForm({...form, password: e.target.value})}
+                required
+              />
+              <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
+            </div>
           </div>
           <div className="form-group">
             <label className="form-label">Confirm Password</label>
-            <input type="password" className="form-control" placeholder="Repeat password" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})} required />
+            <div className="password-wrapper">
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                className="form-control"
+                placeholder="Repeat password"
+                value={form.confirm}
+                onChange={e => setForm({...form, confirm: e.target.value})}
+                required
+              />
+              <button type="button" className="toggle-password" onClick={() => setShowConfirm(!showConfirm)}>
+                {showConfirm ? <FiEyeOff /> : <FiEye />}
+              </button>
+            </div>
           </div>
           <button type="submit" disabled={loading} className="btn btn-primary btn-lg" style={{width:'100%'}}>
             {loading ? 'Creating Account...' : 'Create Account'}

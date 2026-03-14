@@ -32,7 +32,7 @@ const Footer = () => (
       </div>
     </div>
     <div className="footer-bottom">
-      <p>© {new Date().getFullYear()} MovBD • MERN Stack</p>
+      <p>© {new Date().getFullYear()} MovBD</p>
       <small>
         Developed by
         <a

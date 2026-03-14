@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import './Auth.css';
 
 const Login = () => {
@@ -10,6 +11,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,7 +41,23 @@ const Login = () => {
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input type="password" className="form-control" placeholder="••••••••" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="form-control"
+                placeholder="••••••••"
+                value={form.password}
+                onChange={e => setForm({...form, password: e.target.value})}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
+            </div>
           </div>
           <button type="submit" disabled={loading} className="btn btn-primary btn-lg" style={{width:'100%'}}>
             {loading ? 'Signing in...' : 'Sign In'}
