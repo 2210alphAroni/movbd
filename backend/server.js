@@ -6,8 +6,13 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// CORS - সব origin allow করো
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
