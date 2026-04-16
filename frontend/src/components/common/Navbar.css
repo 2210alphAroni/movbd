@@ -74,7 +74,7 @@
   padding: 8px 16px;
   color: var(--text-primary);
   font-size: 0.85rem;
-  width: 200px;
+  width: 500px;
 }
 .search-input::placeholder { color: var(--text-muted); }
 .search-btn {
