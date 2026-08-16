@@ -24,8 +24,8 @@ const Footer = () => (
         </div>
         <div>
           <h4>Account</h4>
-          <Link to="/login">Login</Link>
-          <Link to="/register">Register</Link>
+          <Link to="/about">About Us</Link>
+          <Link to="/contact">Contact</Link>
           <Link to="/watchlist">Watchlist</Link>
           <Link to="/profile">Profile</Link>
         </div>
@@ -36,7 +36,7 @@ const Footer = () => (
       <small>
         Developed by
         <a
-          href="https://roniportfolio.onrender.com"
+          href="https://nabinurislamroni.me"
           target="_blank"
           rel="noopener noreferrer"
         >
