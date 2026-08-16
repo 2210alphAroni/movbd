@@ -1,10 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { moviesAPI, reviewsAPI, watchlistAPI } from '../utils/api';
-import { useAuth } from '../context/AuthContext';
-import { FiStar, FiBookmark, FiPlay, FiFilm, FiClock, FiCalendar, FiGlobe, FiUser, FiTrash2 } from 'react-icons/fi';
-import toast from 'react-hot-toast';
-import './MovieDetail.css';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { moviesAPI, reviewsAPI, watchlistAPI } from "../utils/api";
+import { useAuth } from "../context/AuthContext";
+import {
+  FiStar,
+  FiBookmark,
+  FiPlay,
+  FiFilm,
+  FiClock,
+  FiCalendar,
+  FiGlobe,
+  FiUser,
+  FiTrash2,
+} from "react-icons/fi";
+import toast from "react-hot-toast";
+import "./MovieDetail.css";
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -16,7 +26,7 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
   const [showMovie, setShowMovie] = useState(false);
-  const [reviewForm, setReviewForm] = useState({ rating: 8, comment: '' });
+  const [reviewForm, setReviewForm] = useState({ rating: 8, comment: "" });
   const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
@@ -29,8 +39,11 @@ const MovieDetail = () => {
     try {
       const res = await moviesAPI.getById(id);
       setMovie(res.data);
-    } catch (err) { navigate('/movies'); }
-    finally { setLoading(false); }
+    } catch (err) {
+      navigate("/movies");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchReviews = async () => {
@@ -43,51 +56,70 @@ const MovieDetail = () => {
   const checkWatchlist = async () => {
     try {
       const res = await watchlistAPI.get();
-      setInWatchlist(res.data.some(m => m._id === id));
+      setInWatchlist(res.data.some((m) => m._id === id));
     } catch (err) {}
   };
 
   const handleWatchlist = async () => {
-    if (!user) { toast.error('Please login'); navigate('/login'); return; }
+    if (!user) {
+      toast.error("Please login");
+      navigate("/login");
+      return;
+    }
     try {
       const res = await watchlistAPI.toggle(id);
       setInWatchlist(res.data.added);
       toast.success(res.data.message);
-    } catch (err) { toast.error('Failed'); }
+    } catch (err) {
+      toast.error("Failed");
+    }
   };
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    if (!user) { toast.error('Please login to review'); navigate('/login'); return; }
+    if (!user) {
+      toast.error("Please login to review");
+      navigate("/login");
+      return;
+    }
     setSubmittingReview(true);
     try {
       const res = await reviewsAPI.create(id, reviewForm);
-      setReviews(prev => [res.data, ...prev]);
-      setReviewForm({ rating: 8, comment: '' });
-      toast.success('Review posted!');
+      setReviews((prev) => [res.data, ...prev]);
+      setReviewForm({ rating: 8, comment: "" });
+      toast.success("Review posted!");
       fetchMovie();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to post review');
-    } finally { setSubmittingReview(false); }
+      toast.error(err.response?.data?.message || "Failed to post review");
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   const handleDeleteReview = async (reviewId) => {
     try {
       await reviewsAPI.delete(reviewId);
-      setReviews(prev => prev.filter(r => r._id !== reviewId));
-      toast.success('Review deleted');
+      setReviews((prev) => prev.filter((r) => r._id !== reviewId));
+      toast.success("Review deleted");
       fetchMovie();
-    } catch (err) { toast.error('Failed to delete'); }
+    } catch (err) {
+      toast.error("Failed to delete");
+    }
   };
 
-  if (loading) return <div className="loading-center" style={{minHeight:'100vh'}}><div className="spinner" /></div>;
+  if (loading)
+    return (
+      <div className="loading-center" style={{ minHeight: "100vh" }}>
+        <div className="spinner" />
+      </div>
+    );
   if (!movie) return null;
 
-  const posterUrl = movie.poster?.startsWith('/uploads')
-    ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.poster}`
+  const posterUrl = movie.poster?.startsWith("/uploads")
+    ? `${import.meta.env.VITE_API_URL || "https://movbd-backend.vercel.app"}${movie.poster}`
     : movie.poster;
-  const backdropUrl = movie.backdrop?.startsWith('/uploads')
-    ? `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}${movie.backdrop}`
+  const backdropUrl = movie.backdrop?.startsWith("/uploads")
+    ? `${import.meta.env.VITE_API_URL || "https://movbd-backend.vercel.app"}${movie.backdrop}`
     : movie.backdrop;
 
   return (

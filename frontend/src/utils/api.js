@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API = axios.create({ baseURL: `${import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com'}/api` });
+const API = axios.create({ baseURL: `${import.meta.env.VITE_API_URL || 'https://movbd-backend.vercel.app'}/api` });
 
 API.interceptors.request.use((config) => {
   const user = localStorage.getItem('movbd_user');

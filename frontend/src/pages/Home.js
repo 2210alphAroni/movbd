@@ -1,14 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { moviesAPI, watchlistAPI } from '../utils/api';
-import { useAuth } from '../context/AuthContext';
-import MovieCard from '../components/movie/MovieCard';
-import { FiPlay, FiInfo, FiChevronRight, FiTrendingUp, FiStar } from 'react-icons/fi';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { moviesAPI, watchlistAPI } from "../utils/api";
+import { useAuth } from "../context/AuthContext";
+import MovieCard from "../components/movie/MovieCard";
+import {
+  FiPlay,
+  FiInfo,
+  FiChevronRight,
+  FiTrendingUp,
+  FiStar,
+} from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
-import toast from 'react-hot-toast';
-import './Home.css';
+import toast from "react-hot-toast";
+import "./Home.css";
 
-const GENRES = ['Action', 'Drama', 'Comedy', 'Thriller', 'Romance', 'Horror', 'Sci-Fi', 'Animation'];
+const GENRES = [
+  "Action",
+  "Drama",
+  "Comedy",
+  "Thriller",
+  "Romance",
+  "Horror",
+  "Sci-Fi",
+  "Animation",
+];
 
 const Home = () => {
   const { user } = useAuth();
@@ -26,7 +41,10 @@ const Home = () => {
 
   useEffect(() => {
     if (featured.length > 1) {
-      const timer = setInterval(() => setHeroIndex(i => (i + 1) % featured.length), 6000);
+      const timer = setInterval(
+        () => setHeroIndex((i) => (i + 1) % featured.length),
+        6000,
+      );
       return () => clearInterval(timer);
     }
   }, [featured]);
@@ -35,7 +53,7 @@ const Home = () => {
     try {
       const [featuredRes, moviesRes] = await Promise.all([
         moviesAPI.getFeatured(),
-        moviesAPI.getAll({ limit: 12, sort: 'newest' })
+        moviesAPI.getAll({ limit: 12, sort: "newest" }),
       ]);
       setFeatured(featuredRes.data || []);
       setMovies(moviesRes.data.movies || []);
@@ -49,25 +67,35 @@ const Home = () => {
   const fetchWatchlist = async () => {
     try {
       const res = await watchlistAPI.get();
-      setWatchlist((res.data || []).map(m => m._id));
+      setWatchlist((res.data || []).map((m) => m._id));
     } catch (err) {}
   };
 
   const handleWatchlistToggle = async (movieId) => {
-    if (!user) { toast.error('Please login to use watchlist'); return; }
+    if (!user) {
+      toast.error("Please login to use watchlist");
+      return;
+    }
     try {
       const res = await watchlistAPI.toggle(movieId);
-      setWatchlist(prev => res.data.added ? [...prev, movieId] : prev.filter(id => id !== movieId));
+      setWatchlist((prev) =>
+        res.data.added
+          ? [...prev, movieId]
+          : prev.filter((id) => id !== movieId),
+      );
       toast.success(res.data.message);
     } catch (err) {
-      toast.error('Failed to update watchlist');
+      toast.error("Failed to update watchlist");
     }
   };
 
   const hero = featured[heroIndex];
   const heroPoster = hero?.backdrop || hero?.poster;
-  const API_URL = import.meta.env.VITE_API_URL || 'https://movbd-backend.onrender.com';
-  const heroPosterUrl = heroPoster?.startsWith('/uploads') ? `${API_URL}${heroPoster}` : heroPoster;
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://movbd-backend.vercel.app";
+  const heroPosterUrl = heroPoster?.startsWith("/uploads")
+    ? `${API_URL}${heroPoster}`
+    : heroPoster;
 
   return (
     <div className="home page-enter">
