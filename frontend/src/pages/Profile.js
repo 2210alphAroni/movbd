@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../utils/api';
 import toast from 'react-hot-toast';
-import { FiCamera, FiUser, FiMail, FiLock, FiSave } from 'react-icons/fi';
+import { FiCamera, FiUser, FiMail, FiLock, FiSave, FiEye, FiEyeOff } from 'react-icons/fi';
 import './Profile.css';
 
 const Profile = () => {
@@ -11,6 +11,8 @@ const Profile = () => {
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || '');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const fileRef = useRef();
 
   const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -93,18 +95,42 @@ const Profile = () => {
             {/* Password */}
             <div className="form-group">
               <label className="form-label"><FiLock /> New Password</label>
-              <input
-                name="password" value={form.password} onChange={handleChange}
-                className="form-control" type="password" placeholder="Leave blank to keep current"
-              />
+              <div className="password-input-wrap">
+                <input
+                  name="password" value={form.password} onChange={handleChange}
+                  className="form-control" type={showPassword ? 'text' : 'password'}
+                  placeholder="Leave blank to keep current"
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
             </div>
 
             <div className="form-group">
               <label className="form-label"><FiLock /> Confirm Password</label>
-              <input
-                name="confirmPassword" value={form.confirmPassword} onChange={handleChange}
-                className="form-control" type="password" placeholder="Repeat new password"
-              />
+              <div className="password-input-wrap">
+                <input
+                  name="confirmPassword" value={form.confirmPassword} onChange={handleChange}
+                  className="form-control" type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Repeat new password"
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  tabIndex={-1}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
             </div>
 
             <button type="submit" disabled={loading} className="btn btn-primary btn-lg profile-save-btn">

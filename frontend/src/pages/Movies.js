@@ -58,8 +58,15 @@ const Movies = () => {
 
   useEffect(() => { fetchMovies(); }, [fetchMovies]);
 
+  // Changing an actual filter (search/genre/quality/sort) should reset to page 1
   const handleFilter = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value, page: 1 }));
+  };
+
+  // Changing the page itself should NOT reset page back to 1
+  const handlePageChange = (page) => {
+    setFilters(prev => ({ ...prev, page }));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleWatchlistToggle = async (movieId) => {
@@ -167,12 +174,12 @@ const Movies = () => {
 
               {totalPages > 1 && (
                 <div className="pagination">
-                  <button disabled={currentPage === 1} onClick={() => handleFilter('page', currentPage - 1)} className="btn btn-ghost">← Prev</button>
+                  <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)} className="btn btn-ghost">← Prev</button>
                   {[...Array(Math.min(totalPages, 7))].map((_, i) => {
                     const p = i + 1;
-                    return <button key={p} className={`page-btn ${p === currentPage ? 'active' : ''}`} onClick={() => handleFilter('page', p)}>{p}</button>;
+                    return <button key={p} className={`page-btn ${p === currentPage ? 'active' : ''}`} onClick={() => handlePageChange(p)}>{p}</button>;
                   })}
-                  <button disabled={currentPage === totalPages} onClick={() => handleFilter('page', currentPage + 1)} className="btn btn-ghost">Next →</button>
+                  <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)} className="btn btn-ghost">Next →</button>
                 </div>
               )}
             </>

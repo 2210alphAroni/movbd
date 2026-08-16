@@ -13,6 +13,9 @@ import Watchlist from './pages/Watchlist';
 import Profile from './pages/Profile';
 import AdminDashboard from './components/admin/AdminDashboard';
 import './components/admin/Admin.css';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import ChatWidget from './components/common/ChatWidget';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -47,6 +50,8 @@ function AppRoutes() {
       <Route path="/watchlist" element={<ProtectedRoute><AppLayout><Watchlist /></AppLayout></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
       <Route path="/admin/*" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/about" element={<AppLayout><About /></AppLayout>} />
+      <Route path="/contact" element={<AppLayout><Contact /></AppLayout>} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
@@ -57,6 +62,7 @@ function App() {
     <AuthProvider>
       <Router>
         <AppRoutes />
+        <ChatWidget />
         <Toaster
           position="top-right"
           toastOptions={{

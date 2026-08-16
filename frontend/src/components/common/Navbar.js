@@ -40,6 +40,7 @@ const Navbar = () => {
         <div className="nav-links">
           <Link to="/" className={location.pathname === '/' ? 'active' : ''}>Home</Link>
           <Link to="/movies" className={location.pathname.startsWith('/movies') ? 'active' : ''}>Movies</Link>
+          <Link to="/about" className={location.pathname.startsWith('/about') ? 'active' : ''}>About</Link>
           {isAdmin && <Link to="/admin" className={location.pathname.startsWith('/admin') ? 'active' : ''}>Admin</Link>}
         </div>
 
@@ -96,6 +97,7 @@ const Navbar = () => {
             <button type="submit"><FiSearch /></button>
           </form>
           <Link to="/">Home</Link>
+          <Link to="/about">About</Link>
           <Link to="/movies">Movies</Link>
           {user ? (
             <>
