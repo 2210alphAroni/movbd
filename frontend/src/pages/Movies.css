@@ -1,7 +1,7 @@
 .movies-page { padding-bottom: 80px; }
 .movies-header {
   padding: 120px 0 40px;
-  background: linear-gradient(to bottom, rgba(229,9,20,0.08), transparent);
+  background: linear-gradient(to bottom, var(--accent-glow), transparent);
   border-bottom: 1px solid var(--border);
   margin-bottom: 40px;
 }
@@ -17,7 +17,7 @@
   position: sticky; top: 80px;
 }
 .filters-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.filters-header h3 { font-size: 1rem; font-weight: 600; }
+.filters-header h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
 .clear-filters {
   display: flex; align-items: center; gap: 4px;
   font-size: 0.8rem; color: var(--accent);
@@ -34,7 +34,7 @@
   color: var(--text-secondary);
 }
 .filter-search:focus-within { border-color: var(--accent); }
-.filter-search input { flex: 1; background: none; border: none; outline: none; color: white; font-size: 0.88rem; }
+.filter-search input { flex: 1; background: none; border: none; outline: none; color: var(--text-primary); font-size: 0.88rem; }
 .filter-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag {
   padding: 5px 12px; border-radius: 50px;
@@ -43,7 +43,9 @@
   border: 1px solid var(--border);
   transition: all var(--transition);
 }
-.tag:hover, .tag.active { background: var(--accent); color: white; border-color: var(--accent); }
+/* Intentional: active/hover tag keeps white text — background becomes
+   solid accent red, so white text is the correct contrast in both themes */
+.tag:hover, .tag.active { background: var(--accent); color: #ffffff; border-color: var(--accent); }
 
 /* Main */
 .movies-toolbar {
@@ -54,6 +56,7 @@
 .filter-badge {
   position: absolute; top: -4px; right: -4px;
   width: 14px; height: 14px; background: var(--accent);
+  color: #ffffff;
   border-radius: 50%; font-size: 0.6rem; display: flex;
   align-items: center; justify-content: center;
 }
@@ -74,7 +77,8 @@
   border: 1px solid var(--border);
   font-size: 0.88rem; transition: all var(--transition);
 }
-.page-btn:hover, .page-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+/* Intentional: active/hover page number keeps white text on solid accent bg */
+.page-btn:hover, .page-btn.active { background: var(--accent); color: #ffffff; border-color: var(--accent); }
 
 @media (max-width: 1024px) {
   .movies-layout { grid-template-columns: 1fr; }

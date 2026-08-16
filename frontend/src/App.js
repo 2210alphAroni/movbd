@@ -16,6 +16,7 @@ import './components/admin/Admin.css';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import ChatWidget from './components/common/ChatWidget';
+import { ThemeProvider } from './context/ThemeContext';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -59,6 +60,7 @@ function AppRoutes() {
 
 function App() {
   return (
+    <ThemeProvider>
     <AuthProvider>
       <Router>
         <AppRoutes />
@@ -72,6 +74,7 @@ function App() {
         />
       </Router>
     </AuthProvider>
+    </ThemeProvider>
   );
 }
 

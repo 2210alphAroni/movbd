@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #12121a 0%, #1a1a2e 100%);
+  background: var(--surface-gradient);
 }
 .contact-hero-backdrop {
   position: absolute;

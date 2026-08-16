@@ -17,6 +17,7 @@
   font-weight: 700;
   margin-bottom: 2rem;
   text-align: center;
+  color: var(--text-primary);
 }
 
 .avatar-section {
@@ -51,9 +52,12 @@
   justify-content: center;
   font-size: 2.5rem;
   font-weight: 700;
-  color: white;
+  color: #ffffff;
 }
 
+/* Intentional: this is a hover overlay directly on top of the avatar photo,
+   so it stays a dark scrim with white icon in both themes for contrast
+   against arbitrary photo content — not a theme bug. */
 .avatar-overlay {
   position: absolute;
   inset: 0;
@@ -64,7 +68,7 @@
   opacity: 0;
   transition: opacity 0.2s;
   font-size: 1.5rem;
-  color: white;
+  color: #ffffff;
 }
 
 .avatar-wrap:hover .avatar-overlay {

@@ -1,8 +1,10 @@
 :root {
+  color-scheme: dark;
   --bg-primary: #0a0a0f;
   --bg-secondary: #111118;
   --bg-card: #16161f;
   --bg-hover: #1e1e2a;
+  --surface: #16161f;
   --accent: #e50914;
   --accent-dark: #b20710;
   --accent-glow: rgba(229, 9, 20, 0.3);
@@ -19,6 +21,49 @@
   --shadow: 0 4px 24px rgba(0,0,0,0.4);
   --shadow-lg: 0 8px 48px rgba(0,0,0,0.6);
   --transition: 0.2s ease;
+
+  /* Theme-aware surface gradient (used by hero/banner sections) */
+  --surface-gradient: linear-gradient(135deg, #12121a 0%, #1a1a2e 100%);
+
+  /* Theme-aware hero overlay (used by Home hero backdrop) */
+  --hero-overlay-strong: rgba(10, 10, 15, 0.95);
+  --hero-overlay-mid: rgba(10, 10, 15, 0.6);
+  --hero-overlay-fade: rgba(10, 10, 15, 1);
+  --hero-brightness: 0.5;
+
+  --white-overlay-soft: rgba(255, 255, 255, 0.06);
+  --white-overlay-med: rgba(255, 255, 255, 0.12);
+}
+
+/* Light theme overrides */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg-primary: #f6f6fa;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #eef0f5;
+  --surface: #ffffff;
+  --accent: #e50914;
+  --accent-dark: #b20710;
+  --accent-glow: rgba(229, 9, 20, 0.18);
+  --gold: #c98b0d;
+  --text-primary: #14141c;
+  --text-secondary: #52525f;
+  --text-muted: #8a8a97;
+  --border: #e3e3ea;
+  --border-light: #d2d2dd;
+  --shadow: 0 4px 24px rgba(20,20,28,0.08);
+  --shadow-lg: 0 8px 48px rgba(20,20,28,0.12);
+
+  --surface-gradient: linear-gradient(135deg, #ffffff 0%, #f0f0f7 100%);
+
+  --hero-overlay-strong: rgba(246, 246, 250, 0.95);
+  --hero-overlay-mid: rgba(246, 246, 250, 0.65);
+  --hero-overlay-fade: rgba(246, 246, 250, 1);
+  --hero-brightness: 0.85;
+
+  --white-overlay-soft: rgba(20, 20, 28, 0.05);
+  --white-overlay-med: rgba(20, 20, 28, 0.09);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,12 +76,24 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 button { cursor: pointer; font-family: var(--font-body); }
 input, textarea, select { font-family: var(--font-body); }
+
+/* Safety net: ANY input/textarea/select on the site (even ones that don't
+   use the .form-control class, e.g. inside custom widgets) should still
+   follow the current theme's text and caret color. */
+input, textarea, select {
+  color: var(--text-primary);
+  caret-color: var(--text-primary);
+}
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+}
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
@@ -90,8 +147,8 @@ input, textarea, select { font-family: var(--font-body); }
   border: 1.5px solid var(--border-light);
 }
 .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-.btn-ghost { background: rgba(255,255,255,0.06); color: var(--text-primary); }
-.btn-ghost:hover { background: rgba(255,255,255,0.12); }
+.btn-ghost { background: var(--white-overlay-soft); color: var(--text-primary); }
+.btn-ghost:hover { background: var(--white-overlay-med); }
 .btn-lg { padding: 14px 32px; font-size: 1rem; border-radius: var(--radius-lg); }
 .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
 
@@ -113,6 +170,19 @@ input, textarea, select { font-family: var(--font-body); }
 .form-control::placeholder { color: var(--text-muted); }
 textarea.form-control { resize: vertical; min-height: 100px; }
 select.form-control option { background: var(--bg-card); }
+
+/* Stop the browser's autofill (saved login/email) from forcing its own
+   dark background — without this, autofilled fields ignore --bg-hover
+   entirely and can look black even in light theme. */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus,
+.form-control:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--text-primary);
+  caret-color: var(--text-primary);
+  transition: background-color 9999s ease-in-out 0s;
+  box-shadow: 0 0 0px 1000px var(--bg-hover) inset;
+}
 
 /* Badge */
 .badge {

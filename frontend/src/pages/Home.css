@@ -15,7 +15,7 @@
   background-image: var(--hero-bg);
   background-size: cover;
   background-position: center top;
-  filter: brightness(0.5);
+  filter: brightness(var(--hero-brightness));
   transition: all 0.8s ease;
 }
 .hero-backdrop {
@@ -23,11 +23,11 @@
   inset: 0;
   background: linear-gradient(
     to right,
-    rgba(10, 10, 15, 0.95) 0%,
-    rgba(10, 10, 15, 0.6) 50%,
+    var(--hero-overlay-strong) 0%,
+    var(--hero-overlay-mid) 50%,
     transparent 100%
   ),
-  linear-gradient(to top, rgba(10, 10, 15, 1) 0%, transparent 40%);
+  linear-gradient(to top, var(--hero-overlay-fade) 0%, transparent 40%);
 }
 .hero-content { position: relative; z-index: 1; padding-bottom: 80px; padding-top: 120px; }
 .hero-text { max-width: 600px; }
@@ -38,6 +38,7 @@
   letter-spacing: 3px;
   line-height: 1;
   margin-bottom: 8px;
+  color: var(--text-primary);
   text-shadow: 2px 4px 20px rgba(0,0,0,0.5);
 }
 .hero-title-bn {
@@ -70,7 +71,7 @@
 .dot-btn {
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.3);
+  background: var(--border-light);
   border: none;
   transition: all var(--transition);
 }
@@ -113,6 +114,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   text-align: center;
+  color: var(--text-primary);
   transition: all 0.2s ease;
   animation: fadeUp 0.4s ease both;
   animation-delay: var(--delay);
@@ -120,6 +122,7 @@
 .genre-card:hover {
   background: var(--accent);
   border-color: var(--accent);
+  color: #ffffff;
   transform: translateY(-4px);
   box-shadow: 0 8px 24px var(--accent-glow);
 }
@@ -128,7 +131,7 @@
 /* Stats Banner */
 .stats-banner {
   padding: 60px 0;
-  background: linear-gradient(135deg, #12121a 0%, #1a1a2e 100%);
+  background: var(--surface-gradient);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   margin-top: 40px;
@@ -142,9 +145,10 @@
 .stat-item {
   display: flex; flex-direction: column;
   align-items: center; gap: 8px;
+  color: var(--text-primary);
 }
 .stat-icon { font-size: 2rem; color: var(--accent); margin-bottom: 4px; }
-.stat-item strong { font-size: 1.1rem; }
+.stat-item strong { font-size: 1.1rem; color: var(--text-primary); }
 .stat-item span { color: var(--text-muted); font-size: 0.85rem; }
 
 @media (max-width: 768px) {
