@@ -42,7 +42,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
   animation: chatPanelIn 0.2s ease both;
 }
 
@@ -57,7 +57,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: linear-gradient(135deg, #12121a 0%, #1a1a2e 100%);
+  background: var(--surface-gradient);
   border-bottom: 1px solid var(--border);
 }
 .chat-header-info {
@@ -80,6 +80,7 @@
 .chat-header-info strong {
   display: block;
   font-size: 0.9rem;
+  color: var(--text-primary);
 }
 .chat-status {
   display: flex;
@@ -106,7 +107,7 @@
   justify-content: center;
   transition: color 0.2s ease;
 }
-.chat-close-btn:hover { color: #fff; }
+.chat-close-btn:hover { color: var(--text-primary); }
 
 /* Body */
 .chat-panel-body {
@@ -138,7 +139,7 @@
   flex-shrink: 0;
 }
 .chat-bubble-avatar.user {
-  background: var(--bg-hover, #23232f);
+  background: var(--bg-hover);
   color: var(--text-secondary);
 }
 .chat-bubble {
@@ -149,8 +150,8 @@
   line-height: 1.5;
 }
 .chat-bubble.agent {
-  background: var(--bg-hover, #23232f);
-  color: var(--text-primary, #fff);
+  background: var(--bg-hover);
+  color: var(--text-primary);
   border-bottom-left-radius: 4px;
 }
 .chat-bubble.user {
@@ -190,11 +191,11 @@
 }
 .chat-panel-input input {
   flex: 1;
-  background: var(--bg-hover, #23232f);
+  background: var(--bg-hover);
   border: 1px solid var(--border);
   border-radius: 50px;
   padding: 10px 16px;
-  color: var(--text-primary, #fff);
+  color: var(--text-primary);
   font-size: 0.86rem;
   outline: none;
   transition: border-color 0.2s ease;

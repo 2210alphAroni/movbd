@@ -1,21 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { adminAPI } from "../../utils/api";
-import { FiEdit, FiTrash2, FiEye, FiEyeOff, FiStar } from "react-icons/fi";
+import { FiEdit, FiTrash2, FiEye, FiEyeOff, FiStar, FiX, FiAlertTriangle, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import toast from "react-hot-toast";
+
+const LIMIT = 20;
 
 const AdminMovies = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState(null); // { id, title }
+  const [deleting, setDeleting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalMovies, setTotalMovies] = useState(0);
 
-  useEffect(() => {
-    fetchMovies();
-  }, []);
+    useEffect(() => {
+    fetchMovies(page);
+  }, [page]);
 
-  const fetchMovies = async () => {
+  const fetchMovies = async (pageNum) => {
+    setLoading(true);
     try {
-      const res = await adminAPI.getMovies({ limit: 50 });
+      const res = await adminAPI.getMovies({ limit: LIMIT, page: pageNum });
       setMovies(res.data.movies);
+      // backend shape guess: adjust field names if your API returns differently
+      const total = res.data.total ?? res.data.totalMovies ?? res.data.movies?.length ?? 0;
+      setTotalMovies(total);
+      setTotalPages(res.data.totalPages ?? Math.max(1, Math.ceil(total / LIMIT)));
     } catch (err) {
       toast.error("Failed to load movies");
     } finally {
@@ -23,14 +35,23 @@ const AdminMovies = () => {
     }
   };
 
-  const handleDelete = async (id, title) => {
-    if (!window.confirm(`Delete "${title}"?`)) return;
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await adminAPI.deleteMovie(id);
-      setMovies((prev) => prev.filter((m) => m._id !== id));
+      await adminAPI.deleteMovie(deleteTarget.id);
       toast.success("Movie deleted");
+      setDeleteTarget(null);
+      // current page e jodi last item delete hoy ebong ei page e r kichu na thake, previous page e jao
+      if (movies.length === 1 && page > 1) {
+        setPage((p) => p - 1);
+      } else {
+        fetchMovies(page);
+      }
     } catch (err) {
       toast.error("Delete failed");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -50,6 +71,24 @@ const AdminMovies = () => {
     } catch (err) {
       toast.error("Failed");
     }
+  };
+
+  const goToPage = (p) => {
+    if (p < 1 || p > totalPages || p === page) return;
+    setPage(p);
+  };
+
+  // page number list বানানো (max 5টা number দেখাবে, বাকি গুলা ... দিয়ে)
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    let start = Math.max(1, page - Math.floor(maxVisible / 2));
+    let end = Math.min(totalPages, start + maxVisible - 1);
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
   };
 
   if (loading)
@@ -127,7 +166,7 @@ const AdminMovies = () => {
                       <FiEdit />
                     </Link>
                     <button
-                      onClick={() => handleDelete(movie._id, movie.title)}
+                      onClick={() => setDeleteTarget({ id: movie._id, title: movie.title })}
                       className="btn btn-sm"
                       style={{ color: "var(--accent)" }}
                     >
@@ -140,6 +179,84 @@ const AdminMovies = () => {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          <span className="pagination-info">
+            For {totalMovies} movies, showing {(page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, totalMovies)}
+          </span>
+          <div className="pagination-controls">
+            <button
+              className="page-btn"
+              onClick={() => goToPage(page - 1)}
+              disabled={page === 1}
+            >
+              <FiChevronLeft />
+            </button>
+
+            {getPageNumbers()[0] > 1 && (
+              <>
+                <button className="page-btn" onClick={() => goToPage(1)}>1</button>
+                {getPageNumbers()[0] > 2 && <span className="page-dots">...</span>}
+              </>
+            )}
+
+            {getPageNumbers().map((p) => (
+              <button
+                key={p}
+                className={`page-btn ${p === page ? "active" : ""}`}
+                onClick={() => goToPage(p)}
+              >
+                {p}
+              </button>
+            ))}
+
+            {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
+              <>
+                {getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1 && (
+                  <span className="page-dots">...</span>
+                )}
+                <button className="page-btn" onClick={() => goToPage(totalPages)}>
+                  {totalPages}
+                </button>
+              </>
+            )}
+
+            <button
+              className="page-btn"
+              onClick={() => goToPage(page + 1)}
+              disabled={page === totalPages}
+            >
+              <FiChevronRight />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div className="modal-overlay" onClick={() => !deleting && setDeleteTarget(null)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setDeleteTarget(null)} disabled={deleting}>
+              <FiX />
+            </button>
+            <div className="modal-icon-warning">
+              <FiAlertTriangle size={28} />
+            </div>
+            <h3>Delete movie?</h3>
+            <p>
+              Are you sure you want to delete <strong>{deleteTarget.title}</strong>? This action cannot be undone.
+            </p>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setDeleteTarget(null)} disabled={deleting}>
+                Cancel
+              </button>
+              <button className="btn-danger" onClick={confirmDelete} disabled={deleting}>
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

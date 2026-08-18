@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import Home from './pages/Home';
+import Landing from "./pages/Landing";
 import Movies from './pages/Movies';
 import MovieDetail from './pages/MovieDetail';
 import Login from './pages/Login';
@@ -43,7 +44,8 @@ const AppLayout = ({ children, showFooter = true }) => (
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<AppLayout><Home /></AppLayout>} />
+      <Route path="/" element={<Landing />} />
+      <Route path="/home" element={<AppLayout><Home /></AppLayout>} />
       <Route path="/movies" element={<AppLayout><Movies /></AppLayout>} />
       <Route path="/movies/:id" element={<AppLayout><MovieDetail /></AppLayout>} />
       <Route path="/login" element={<Login />} />
