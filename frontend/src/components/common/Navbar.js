@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -20,7 +20,9 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -31,39 +33,45 @@ const Navbar = () => {
   useEffect(() => {
     setMenuOpen(false);
     setDropdownOpen(false);
+    setSearchOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+  }, [searchOpen]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/movies?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
+      setSearchOpen(false);
     }
   };
 
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="container navbar-inner">
-        <Link to="/" className="nav-logo">
+        <Link to="/home" className="nav-logo">
           <span className="logo-text">MOV</span>
           <span className="logo-accent">BD</span>
         </Link>
 
         <div className="nav-links">
-          <Link to="/" className={location.pathname === "/" ? "active" : ""}>
+          <Link to="/home" className={location.pathname === "/home" ? "active" : ""}>
             Home
-          </Link>
-          <Link
-            to="/movies"
-            className={location.pathname.startsWith("/movies") ? "active" : ""}
-          >
-            Movies
           </Link>
           <Link
             to="/about"
             className={location.pathname.startsWith("/about") ? "active" : ""}
           >
             About
+          </Link>
+          <Link
+            to="/movies"
+            className={location.pathname.startsWith("/movies") ? "active" : ""}
+          >
+            Movies
           </Link>
           {isAdmin && (
             <Link
@@ -76,17 +84,29 @@ const Navbar = () => {
         </div>
 
         <div className="nav-right">
-          <form onSubmit={handleSearch} className="search-form">
+          <form
+            onSubmit={handleSearch}
+            className={`search-form ${searchOpen ? "open" : ""}`}
+            onMouseLeave={() => !searchQuery && setSearchOpen(false)}
+          >
+            <button
+              type={searchOpen ? "submit" : "button"}
+              className="search-btn"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+            >
+              <FiSearch />
+            </button>
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Search movies..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onBlur={() => !searchQuery && setSearchOpen(false)}
               className="search-input"
+              tabIndex={searchOpen ? 0 : -1}
             />
-            <button type="submit" className="search-btn">
-              <FiSearch />
-            </button>
           </form>
 
           <ThemeToggle />

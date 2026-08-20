@@ -204,13 +204,14 @@ const Home = () => {
       <section className="genre-section">
         <div className="container">
           <h2 className="section-title">Browse by Genre</h2>
-          <div className="genre-grid">
-            {GENRES.map((genre, i) => (
+        </div>
+        <div className="genre-marquee">
+          <div className="genre-track">
+            {[...GENRES, ...GENRES].map((genre, i) => (
               <Link
-                key={genre}
+                key={`${genre}-${i}`}
                 to={`/movies?genre=${genre}`}
                 className="genre-card"
-                style={{ "--delay": `${i * 0.05}s` }}
               >
                 <span className="genre-name">{genre}</span>
               </Link>

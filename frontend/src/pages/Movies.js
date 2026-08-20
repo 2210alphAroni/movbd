@@ -173,13 +173,68 @@ const Movies = () => {
               </div>
 
               {totalPages > 1 && (
-                <div className="pagination">
-                  <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)} className="btn btn-ghost">← Prev</button>
+                // NOTE: className is namespaced (movies-pagination-bar / movies-nav-btn /
+                // movies-page-btn) instead of the generic .pagination / .btn / .page-btn,
+                // because those generic names collide with another stylesheet loaded
+                // elsewhere in the app (e.g. an admin pagination component), and whichever
+                // one loads later in the bundle wins — that's what was stretching these
+                // buttons to full width and stacking them on mobile.
+                //
+                // On top of the rename, the layout-critical properties are ALSO set as
+                // inline styles below. Inline styles always beat an external class no
+                // matter its specificity or load order, so this is now guaranteed to stay
+                // a row of compact buttons on every screen size, regardless of what any
+                // other CSS file in the project does.
+                <div
+                  className="movies-pagination-bar"
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 8,
+                    margin: '48px auto 0',
+                    maxWidth: '100%'
+                  }}
+                >
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="btn btn-ghost movies-nav-btn"
+                    style={{ flex: '0 0 auto', width: 'auto', display: 'inline-flex' }}
+                  >
+                    ← Prev
+                  </button>
+
                   {[...Array(Math.min(totalPages, 7))].map((_, i) => {
                     const p = i + 1;
-                    return <button key={p} className={`page-btn ${p === currentPage ? 'active' : ''}`} onClick={() => handlePageChange(p)}>{p}</button>;
+                    return (
+                      <button
+                        key={p}
+                        className={`movies-page-btn ${p === currentPage ? 'active' : ''}`}
+                        style={{
+                          flex: '0 0 auto',
+                          width: 36,
+                          height: 36,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        onClick={() => handlePageChange(p)}
+                      >
+                        {p}
+                      </button>
+                    );
                   })}
-                  <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)} className="btn btn-ghost">Next →</button>
+
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="btn btn-ghost movies-nav-btn"
+                    style={{ flex: '0 0 auto', width: 'auto', display: 'inline-flex' }}
+                  >
+                    Next →
+                  </button>
                 </div>
               )}
             </>

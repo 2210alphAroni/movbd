@@ -102,13 +102,26 @@
 
 /* Genre Section */
 .genre-section { padding: 40px 0; }
-.genre-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
+.genre-marquee {
+  overflow: hidden;
   margin-top: 24px;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+.genre-track {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: genreMarquee 22s linear infinite;
+}
+.genre-track:hover { animation-play-state: paused; }
+@keyframes genreMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 .genre-card {
+  flex: 0 0 auto;
+  min-width: 160px;
   padding: 20px;
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -116,8 +129,6 @@
   text-align: center;
   color: var(--text-primary);
   transition: all 0.2s ease;
-  animation: fadeUp 0.4s ease both;
-  animation-delay: var(--delay);
 }
 .genre-card:hover {
   background: var(--accent);
@@ -126,7 +137,7 @@
   transform: translateY(-4px);
   box-shadow: 0 8px 24px var(--accent-glow);
 }
-.genre-name { font-weight: 600; font-size: 0.9rem; }
+.genre-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; }
 
 /* Stats Banner */
 .stats-banner {
@@ -155,4 +166,5 @@
   .movies-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
   .stats-grid { grid-template-columns: 1fr; gap: 24px; }
   .hero-content { padding-bottom: 60px; padding-top: 80px; }
+  .genre-card { min-width: 130px; padding: 16px; }
 }

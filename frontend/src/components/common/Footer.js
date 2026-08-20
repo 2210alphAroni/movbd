@@ -25,7 +25,7 @@ const Footer = () => (
             </svg>
           </a>
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/ronystorys?igsi=eGw2bDNqNnJjMGQ2"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
@@ -66,13 +66,12 @@ const Footer = () => (
           <Link to="/faq">FAQ</Link>
           <Link to="/help">Help Center</Link>
           <Link to="/report">Report an Issue</Link>
-          <a href="mailto:support@movbd.com">support@movbd.com</a>
+          <a href="mailto:pstaru8@gmail.com">pstaru8@gmail.com</a>
         </div>
         <div>
           <h4>Legal</h4>
           <Link to="/privacy-policy">Privacy Policy</Link>
           <Link to="/terms">Terms of Service</Link>
-          <Link to="/dmca">DMCA</Link>
         </div>
       </div>
     </div>

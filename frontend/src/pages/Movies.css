@@ -66,19 +66,55 @@
 .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
 .empty-state p { font-size: 1.1rem; margin-bottom: 20px; }
 
-.pagination {
-  display: flex; justify-content: center; align-items: center;
-  gap: 8px; margin-top: 48px; flex-wrap: wrap;
+/* ============================================================
+   Pagination
+   Renamed to movies-pagination-bar / movies-nav-btn / movies-page-btn
+   (previously .pagination / .btn / .page-btn) because those generic
+   names are also used elsewhere in the app (e.g. an admin dashboard's
+   own pagination), and whichever stylesheet loads later in the bundle
+   wins on the class name collision — that's what was breaking this
+   specifically on mobile. Layout-critical properties (display, flex,
+   width) are ALSO set inline in Movies.jsx as a second line of defense:
+   inline styles beat any external class regardless of load order or
+   specificity, so this can no longer be overridden by anything else
+   in the app, on any screen size.
+   ============================================================ */
+.movies-pagination-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 48px auto 0;
+  max-width: 100%;
 }
-.page-btn {
-  width: 36px; height: 36px;
+.movies-pagination-bar .movies-nav-btn {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 84px;
+  white-space: nowrap;
+}
+.movies-pagination-bar .movies-page-btn {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius);
-  background: var(--bg-card); color: var(--text-secondary);
+  background: var(--bg-card);
+  color: var(--text-secondary);
   border: 1px solid var(--border);
-  font-size: 0.88rem; transition: all var(--transition);
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
 }
 /* Intentional: active/hover page number keeps white text on solid accent bg */
-.page-btn:hover, .page-btn.active { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+.movies-pagination-bar .movies-page-btn:hover,
+.movies-pagination-bar .movies-page-btn.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
 
 @media (max-width: 1024px) {
   .movies-layout { grid-template-columns: 1fr; }
@@ -88,4 +124,10 @@
 }
 @media (min-width: 1025px) {
   .filter-toggle { display: none; }
+}
+
+@media (max-width: 480px) {
+  .movies-pagination-bar { gap: 6px; }
+  .movies-pagination-bar .movies-nav-btn { min-width: 0; padding: 8px 12px; font-size: 0.82rem; }
+  .movies-pagination-bar .movies-page-btn { width: 32px; height: 32px; font-size: 0.82rem; }
 }

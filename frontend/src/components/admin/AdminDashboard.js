@@ -131,7 +131,7 @@ const AdminDashboard = () => {
             {location.pathname === '/admin/movies/add' && 'Add New Movie'}
             {location.pathname === '/admin/users' && 'Manage Users'}
           </h2>
-          <Link to="/" className="btn btn-ghost btn-sm">← View Site</Link>
+          <Link to="/home" className="btn btn-ghost btn-sm">← View Site</Link>
         </div>
 
         <Routes>

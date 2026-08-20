@@ -18,6 +18,9 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import ChatWidget from './components/common/ChatWidget';
 import { ThemeProvider } from './context/ThemeContext';
+import Faq from './pages/Faq';
+import HelpCenter from './pages/HelpCenter';
+import ReportIssue from './pages/ReportIssue';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -55,6 +58,9 @@ function AppRoutes() {
       <Route path="/admin/*" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
       <Route path="/about" element={<AppLayout><About /></AppLayout>} />
       <Route path="/contact" element={<AppLayout><Contact /></AppLayout>} />
+      <Route path="/faq" element={<AppLayout><Faq /></AppLayout>} />
+      <Route path="/help" element={<AppLayout><HelpCenter /></AppLayout>} />
+      <Route path="/report" element={<AppLayout><ReportIssue /></AppLayout>} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

@@ -22,7 +22,7 @@ const Landing = () => {
         <h1 className="landing-title">
           Reviews & Watch Trailers of Movies & Series in Bangladesh
           <br />
-          @<span className="accent">MovBD.com</span>
+          @<span className="accent">MovBD.app</span>
         </h1>
 
         <p className="landing-subtitle">
