@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { adminAPI, moviesAPI } from "../../utils/api";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { adminAPI } from "../../utils/api";
 import toast from "react-hot-toast";
 
 const GENRES_LIST = [
@@ -37,8 +37,13 @@ const LANGUAGES = [
 
 const AdminAddMovie = () => {
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
+  const isShortfilm = location.pathname.includes("/shortfilms");
+  const contentName = isShortfilm ? "Short Film" : "Movie";
+  const contentNameLower = isShortfilm ? "short film" : "movie";
+  const listPath = isShortfilm ? "/admin/shortfilms" : "/admin/movies";
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     title: "",
@@ -63,8 +68,8 @@ const AdminAddMovie = () => {
 
   useEffect(() => {
     if (isEdit) {
-      moviesAPI
-        .getById(id)
+      const getItem = isShortfilm ? adminAPI.getShortfilm : adminAPI.getMovie;
+      getItem(id)
         .then((res) => {
           const m = res.data;
           setForm({
@@ -91,9 +96,9 @@ const AdminAddMovie = () => {
                 : m.poster,
             );
         })
-        .catch(() => navigate("/admin/movies"));
+        .catch(() => navigate(listPath));
     }
-  }, [id]);
+  }, [id, isShortfilm, listPath, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -130,6 +135,10 @@ const AdminAddMovie = () => {
       toast.error("Select at least one genre");
       return;
     }
+    if (isShortfilm && Number(form.duration) > 25) {
+      toast.error("Short film duration cannot be more than 25 minutes");
+      return;
+    }
     setLoading(true);
     try {
       const formData = new FormData();
@@ -141,15 +150,17 @@ const AdminAddMovie = () => {
       if (backdropFile) formData.append("backdrop", backdropFile);
 
       if (isEdit) {
-        await adminAPI.updateMovie(id, formData);
-        toast.success("Movie updated!");
+        const updateItem = isShortfilm ? adminAPI.updateShortfilm : adminAPI.updateMovie;
+        await updateItem(id, formData);
+        toast.success(`${contentName} updated!`);
       } else {
-        await adminAPI.createMovie(formData);
-        toast.success("Movie added!");
+        const createItem = isShortfilm ? adminAPI.createShortfilm : adminAPI.createMovie;
+        await createItem(formData);
+        toast.success(`${contentName} added!`);
       }
-      navigate("/admin/movies");
+      navigate(listPath);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to save movie");
+      toast.error(err.response?.data?.message || `Failed to save ${contentNameLower}`);
     } finally {
       setLoading(false);
     }
@@ -161,7 +172,7 @@ const AdminAddMovie = () => {
         <div className="form-grid">
           <div className="form-left">
             <div className="form-group">
-              <label className="form-label">Movie Title (English) *</label>
+              <label className="form-label">{contentName} Title (English) *</label>
               <input
                 name="title"
                 value={form.title}
@@ -172,7 +183,7 @@ const AdminAddMovie = () => {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Movie Title (Bengali)</label>
+              <label className="form-label">{contentName} Title (Bengali)</label>
               <input
                 name="titleBn"
                 value={form.titleBn}
@@ -190,7 +201,7 @@ const AdminAddMovie = () => {
                 className="form-control"
                 required
                 rows={5}
-                placeholder="Movie synopsis..."
+                placeholder={`${contentName} synopsis...`}
               />
             </div>
             <div className="form-row">
@@ -242,7 +253,8 @@ const AdminAddMovie = () => {
                   value={form.duration}
                   onChange={handleChange}
                   className="form-control"
-                  placeholder="e.g. 120"
+                  max={isShortfilm ? "25" : undefined}
+                  placeholder={isShortfilm ? "Maximum 25" : "e.g. 120"}
                 />
               </div>
             </div>
@@ -278,23 +290,23 @@ const AdminAddMovie = () => {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">YouTube Trailer URL (embed)</label>
+              <label className="form-label">Trailer URL (YouTube or Facebook)</label>
               <input
                 name="trailerUrl"
                 value={form.trailerUrl}
                 onChange={handleChange}
                 className="form-control"
-                placeholder="https://www.youtube.com/embed/VIDEO_ID"
+                placeholder="YouTube or Facebook video link"
               />
             </div>
             <div className="form-group">
-              <label className="form-label">YouTube Movie URL (embed)</label>
+              <label className="form-label">{contentName} URL (YouTube or Facebook)</label>
               <input
                 name="movieUrl"
                 value={form.movieUrl}
                 onChange={handleChange}
                 className="form-control"
-                placeholder="https://www.youtube.com/embed/VIDEO_ID"
+                placeholder="YouTube or Facebook video link"
               />
             </div>
           </div>
@@ -362,7 +374,7 @@ const AdminAddMovie = () => {
                   onChange={handleChange}
                 />
                 <span className="toggle" />
-                Publish Movie (visible to users)
+                Publish {contentName} (visible to users)
               </label>
               <label className="toggle-label">
                 <input
@@ -381,7 +393,7 @@ const AdminAddMovie = () => {
         <div className="form-actions">
           <button
             type="button"
-            onClick={() => navigate("/admin/movies")}
+            onClick={() => navigate(listPath)}
             className="btn btn-ghost btn-lg"
           >
             Cancel
@@ -391,7 +403,7 @@ const AdminAddMovie = () => {
             disabled={loading}
             className="btn btn-primary btn-lg"
           >
-            {loading ? "Saving..." : isEdit ? "Update Movie" : "Add Movie"}
+            {loading ? "Saving..." : isEdit ? `Update ${contentName}` : `Add ${contentName}`}
           </button>
         </div>
       </form>

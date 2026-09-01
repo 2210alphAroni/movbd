@@ -43,7 +43,8 @@ const Navbar = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/movies?search=${encodeURIComponent(searchQuery.trim())}`);
+      const targetPath = location.pathname.startsWith("/shortfilms") ? "/shortfilms" : "/movies";
+      navigate(`${targetPath}?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
       setSearchOpen(false);
     }
@@ -73,6 +74,12 @@ const Navbar = () => {
           >
             Movies
           </Link>
+          <Link
+            to="/shortfilms"
+            className={location.pathname.startsWith("/shortfilms") ? "active" : ""}
+          >
+            Short Films
+          </Link>
           {isAdmin && (
             <Link
               to="/admin"
@@ -100,7 +107,7 @@ const Navbar = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search movies..."
+              placeholder={location.pathname.startsWith("/shortfilms") ? "Search short films..." : "Search movies..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onBlur={() => !searchQuery && setSearchOpen(false)}
@@ -180,7 +187,7 @@ const Navbar = () => {
           <form onSubmit={handleSearch} className="mobile-search">
             <input
               type="text"
-              placeholder="Search movies..."
+              placeholder={location.pathname.startsWith("/shortfilms") ? "Search short films..." : "Search movies..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -191,6 +198,7 @@ const Navbar = () => {
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
           <Link to="/movies">Movies</Link>
+          <Link to="/shortfilms">Short Films</Link>
           {user ? (
             <>
               <Link to="/watchlist">Watchlist</Link>

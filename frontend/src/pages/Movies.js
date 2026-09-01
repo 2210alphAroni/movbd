@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { moviesAPI, watchlistAPI } from '../utils/api';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { moviesAPI, shortfilmsAPI, watchlistAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import MovieCard from '../components/movie/MovieCard';
 import { FiFilter, FiSearch, FiX } from 'react-icons/fi';
@@ -18,6 +18,11 @@ const SORT_OPTIONS = [
 
 const Movies = () => {
   const { user } = useAuth();
+  const location = useLocation();
+  const isShortfilms = location.pathname.startsWith('/shortfilms');
+  const contentAPI = isShortfilms ? shortfilmsAPI : moviesAPI;
+  const contentLabel = isShortfilms ? 'short films' : 'movies';
+  const contentTitle = isShortfilms ? 'All Short Films' : 'All Movies';
   const [searchParams, setSearchParams] = useSearchParams();
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
@@ -37,24 +42,24 @@ const Movies = () => {
   });
 
   useEffect(() => {
-    moviesAPI.getGenres().then(res => setGenres(res.data));
+    contentAPI.getGenres().then(res => setGenres(res.data));
     if (user) watchlistAPI.get().then(res => setWatchlist(res.data.map(m => m._id))).catch(() => {});
-  }, [user]);
+  }, [user, isShortfilms]);
 
   const fetchMovies = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await moviesAPI.getAll({ ...filters, limit: 16 });
+      const res = await contentAPI.getAll({ ...filters, limit: 16 });
       setMovies(res.data.movies);
       setTotal(res.data.total);
       setCurrentPage(res.data.currentPage);
       setTotalPages(res.data.pages);
     } catch (err) {
-      toast.error('Failed to load movies');
+      toast.error(`Failed to load ${contentLabel}`);
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, isShortfilms]);
 
   useEffect(() => { fetchMovies(); }, [fetchMovies]);
 
@@ -89,8 +94,8 @@ const Movies = () => {
     <div className="movies-page page-enter">
       <div className="movies-header">
         <div className="container">
-          <h1 className="section-title">All Movies</h1>
-          <p className="movies-count">{total} movies found</p>
+          <h1 className="section-title">{contentTitle}</h1>
+          <p className="movies-count">{total} {contentLabel} found</p>
         </div>
       </div>
 
@@ -108,7 +113,7 @@ const Movies = () => {
               <FiSearch />
               <input
                 type="text"
-                placeholder="Movie title..."
+                placeholder={isShortfilms ? 'Short film title...' : 'Movie title...'}
                 value={filters.search}
                 onChange={e => handleFilter('search', e.target.value)}
               />
@@ -156,7 +161,7 @@ const Movies = () => {
             <div className="loading-center"><div className="spinner" /></div>
           ) : movies.length === 0 ? (
             <div className="empty-state">
-              <p>No movies found</p>
+              <p>No {contentLabel} found</p>
               <button onClick={clearFilters} className="btn btn-outline">Clear Filters</button>
             </div>
           ) : (

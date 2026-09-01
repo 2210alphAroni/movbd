@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { adminAPI } from "../../utils/api";
 import { FiEdit, FiTrash2, FiEye, FiEyeOff, FiStar, FiX, FiAlertTriangle, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import toast from "react-hot-toast";
@@ -7,6 +7,12 @@ import toast from "react-hot-toast";
 const LIMIT = 20;
 
 const AdminMovies = () => {
+  const location = useLocation();
+  const isShortfilms = location.pathname.includes("/shortfilms");
+  const contentName = isShortfilms ? "Short Film" : "Movie";
+  const contentNameLower = isShortfilms ? "short film" : "movie";
+  const contentPluralLower = isShortfilms ? "short films" : "movies";
+  const editBasePath = isShortfilms ? "/admin/shortfilms/edit" : "/admin/movies/edit";
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState(null); // { id, title }
@@ -15,21 +21,22 @@ const AdminMovies = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalMovies, setTotalMovies] = useState(0);
 
-    useEffect(() => {
+  useEffect(() => {
     fetchMovies(page);
-  }, [page]);
+  }, [page, isShortfilms]);
 
   const fetchMovies = async (pageNum) => {
     setLoading(true);
     try {
-      const res = await adminAPI.getMovies({ limit: LIMIT, page: pageNum });
+      const getItems = isShortfilms ? adminAPI.getShortfilms : adminAPI.getMovies;
+      const res = await getItems({ limit: LIMIT, page: pageNum });
       setMovies(res.data.movies);
       // backend shape guess: adjust field names if your API returns differently
       const total = res.data.total ?? res.data.totalMovies ?? res.data.movies?.length ?? 0;
       setTotalMovies(total);
       setTotalPages(res.data.totalPages ?? Math.max(1, Math.ceil(total / LIMIT)));
     } catch (err) {
-      toast.error("Failed to load movies");
+      toast.error(`Failed to load ${contentPluralLower}`);
     } finally {
       setLoading(false);
     }
@@ -39,8 +46,9 @@ const AdminMovies = () => {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await adminAPI.deleteMovie(deleteTarget.id);
-      toast.success("Movie deleted");
+      const deleteItem = isShortfilms ? adminAPI.deleteShortfilm : adminAPI.deleteMovie;
+      await deleteItem(deleteTarget.id);
+      toast.success(`${contentName} deleted`);
       setDeleteTarget(null);
       // current page e jodi last item delete hoy ebong ei page e r kichu na thake, previous page e jao
       if (movies.length === 1 && page > 1) {
@@ -59,14 +67,15 @@ const AdminMovies = () => {
     try {
       const formData = new FormData();
       formData.append("isPublished", (!movie.isPublished).toString());
-      await adminAPI.updateMovie(movie._id, formData);
+      const updateItem = isShortfilms ? adminAPI.updateShortfilm : adminAPI.updateMovie;
+      await updateItem(movie._id, formData);
       setMovies((prev) =>
         prev.map((m) =>
           m._id === movie._id ? { ...m, isPublished: !m.isPublished } : m,
         ),
       );
       toast.success(
-        movie.isPublished ? "Movie unpublished" : "Movie published",
+        movie.isPublished ? `${contentName} unpublished` : `${contentName} published`,
       );
     } catch (err) {
       toast.error("Failed");
@@ -160,7 +169,7 @@ const AdminMovies = () => {
                 <td>
                   <div className="action-btns">
                     <Link
-                      to={`/admin/movies/edit/${movie._id}`}
+                      to={`${editBasePath}/${movie._id}`}
                       className="btn btn-ghost btn-sm"
                     >
                       <FiEdit />
@@ -183,7 +192,7 @@ const AdminMovies = () => {
       {totalPages > 1 && (
         <div className="pagination">
           <span className="pagination-info">
-            For {totalMovies} movies, showing {(page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, totalMovies)}
+            For {totalMovies} {contentPluralLower}, showing {(page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, totalMovies)}
           </span>
           <div className="pagination-controls">
             <button
@@ -242,7 +251,7 @@ const AdminMovies = () => {
             <div className="modal-icon-warning">
               <FiAlertTriangle size={28} />
             </div>
-            <h3>Delete movie?</h3>
+            <h3>Delete {contentNameLower}?</h3>
             <p>
               Are you sure you want to delete <strong>{deleteTarget.title}</strong>? This action cannot be undone.
             </p>

@@ -27,6 +27,13 @@ export const moviesAPI = {
   download: (id) => API.get(`/movies/${id}/download`, { responseType: 'blob' }),
 };
 
+export const shortfilmsAPI = {
+  getAll: (params) => API.get('/shortfilms', { params }),
+  getFeatured: () => API.get('/shortfilms/featured'),
+  getGenres: () => API.get('/shortfilms/genres'),
+  getById: (id) => API.get(`/shortfilms/${id}`),
+};
+
 export const reviewsAPI = {
   getByMovie: (movieId) => API.get(`/reviews/${movieId}`),
   create: (movieId, data) => API.post(`/reviews/${movieId}`, data),
@@ -41,13 +48,19 @@ export const watchlistAPI = {
 export const adminAPI = {
   getStats: () => API.get('/admin/stats'),
   getMovies: (params) => API.get('/admin/movies', { params }),
+  getShortfilms: (params) => API.get('/admin/shortfilms', { params }),
+  getMovie: (id) => API.get(`/admin/movies/${id}`),
+  getShortfilm: (id) => API.get(`/admin/shortfilms/${id}`),
   createMovie: (data) => API.post('/admin/movies', data),
+  createShortfilm: (data) => API.post('/admin/shortfilms', data),
   updateMovie: (id, data) => API.put(`/admin/movies/${id}`, data),
+  updateShortfilm: (id, data) => API.put(`/admin/shortfilms/${id}`, data),
   uploadFile: (id, data, onProgress) => API.post(`/admin/movies/${id}/upload-file`, data, {
     onUploadProgress: onProgress,
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   deleteMovie: (id) => API.delete(`/admin/movies/${id}`),
+  deleteShortfilm: (id) => API.delete(`/admin/shortfilms/${id}`),
   getUsers: () => API.get('/admin/users'),
   deleteUser: (id) => API.delete(`/admin/users/${id}`),
   deleteReview: (id) => API.delete(`/admin/reviews/${id}`),

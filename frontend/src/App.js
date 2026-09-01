@@ -51,6 +51,8 @@ function AppRoutes() {
       <Route path="/home" element={<AppLayout><Home /></AppLayout>} />
       <Route path="/movies" element={<AppLayout><Movies /></AppLayout>} />
       <Route path="/movies/:id" element={<AppLayout><MovieDetail /></AppLayout>} />
+      <Route path="/shortfilms" element={<AppLayout><Movies /></AppLayout>} />
+      <Route path="/shortfilms/:id" element={<AppLayout><MovieDetail /></AppLayout>} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/watchlist" element={<ProtectedRoute><AppLayout><Watchlist /></AppLayout></ProtectedRoute>} />

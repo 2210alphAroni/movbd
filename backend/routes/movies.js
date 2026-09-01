@@ -5,11 +5,13 @@ const fs = require('fs');
 const Movie = require('../models/Movie');
 const { protect } = require('../middleware/auth');
 
+const movieTypeQuery = { $or: [{ contentType: 'movie' }, { contentType: { $exists: false } }] };
+
 // @GET /api/movies - Get all published movies with filters
 router.get('/', async (req, res) => {
   try {
     const { search, genre, language, year, quality, sort, page = 1, limit = 12 } = req.query;
-    const query = { isPublished: true };
+    const query = { isPublished: true, ...movieTypeQuery };
 
     if (search) query.$text = { $search: search };
     if (genre) query.genre = { $in: [genre] };
@@ -41,7 +43,7 @@ router.get('/', async (req, res) => {
 // @GET /api/movies/featured
 router.get('/featured', async (req, res) => {
   try {
-    const movies = await Movie.find({ isPublished: true, isFeatured: true }).limit(5).select('-downloadFile');
+    const movies = await Movie.find({ isPublished: true, isFeatured: true, ...movieTypeQuery }).limit(5).select('-downloadFile');
     res.json(movies);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -51,7 +53,7 @@ router.get('/featured', async (req, res) => {
 // @GET /api/movies/genres - Get all unique genres
 router.get('/genres', async (req, res) => {
   try {
-    const genres = await Movie.distinct('genre', { isPublished: true });
+    const genres = await Movie.distinct('genre', { isPublished: true, ...movieTypeQuery });
     res.json(genres.sort());
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -62,7 +64,7 @@ router.get('/genres', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id).select('-downloadFile');
-    if (!movie || !movie.isPublished) return res.status(404).json({ message: 'Movie not found' });
+    if (!movie || !movie.isPublished || movie.contentType === 'shortfilm') return res.status(404).json({ message: 'Movie not found' });
     res.json(movie);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -73,7 +75,7 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/download', protect, async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id);
-    if (!movie || !movie.isPublished) return res.status(404).json({ message: 'Movie not found' });
+    if (!movie || !movie.isPublished || movie.contentType === 'shortfilm') return res.status(404).json({ message: 'Movie not found' });
     if (!movie.downloadFile) return res.status(404).json({ message: 'No download file available' });
 
     // Increment download count

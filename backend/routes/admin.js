@@ -6,22 +6,37 @@ const Review = require('../models/Review');
 const { protect, adminOnly } = require('../middleware/auth');
 const { uploadPoster, uploadMovie } = require('../middleware/upload');
 
+const MAX_SHORTFILM_DURATION = 25;
+const movieTypeQuery = { $or: [{ contentType: 'movie' }, { contentType: { $exists: false } }] };
+const shortfilmTypeQuery = { contentType: 'shortfilm' };
+
+const parseList = (value) => Array.isArray(value) ? value : value?.split(",").map((item) => item.trim()).filter(Boolean);
+const parseContentType = (req) => req.baseUrl.includes('shortfilms') || req.path.includes('shortfilms') ? 'shortfilm' : 'movie';
+const validateDuration = (contentType, duration) => {
+  const parsed = duration ? parseInt(duration) : undefined;
+  if (contentType === 'shortfilm' && parsed && parsed > MAX_SHORTFILM_DURATION) {
+    return { error: `Short film duration cannot be more than ${MAX_SHORTFILM_DURATION} minutes` };
+  }
+  return { duration: parsed };
+};
+
 // All admin routes require auth + admin role
 router.use(protect, adminOnly);
 
 // @GET /api/admin/stats
 router.get('/stats', async (req, res) => {
   try {
-    const [totalMovies, totalUsers, totalReviews, published, featured] = await Promise.all([
-      Movie.countDocuments(),
+    const [totalMovies, totalShortfilms, totalUsers, totalReviews, published, featured] = await Promise.all([
+      Movie.countDocuments(movieTypeQuery),
+      Movie.countDocuments(shortfilmTypeQuery),
       User.countDocuments({ role: 'user' }),
       Review.countDocuments(),
-      Movie.countDocuments({ isPublished: true }),
-      Movie.countDocuments({ isFeatured: true })
+      Movie.countDocuments({ isPublished: true, ...movieTypeQuery }),
+      Movie.countDocuments({ isFeatured: true, ...movieTypeQuery })
     ]);
     const totalDownloads = await Movie.aggregate([{ $group: { _id: null, total: { $sum: '$downloadCount' } } }]);
     res.json({
-      totalMovies, totalUsers, totalReviews, published, featured,
+      totalMovies, totalShortfilms, totalUsers, totalReviews, published, featured,
       totalDownloads: totalDownloads[0]?.total || 0
     });
   } catch (err) {
@@ -34,12 +49,28 @@ router.get('/stats', async (req, res) => {
 router.get('/movies', async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
-    const movies = await Movie.find()
+    const movies = await Movie.find(movieTypeQuery)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
-    const total = await Movie.countDocuments();
+    const total = await Movie.countDocuments(movieTypeQuery);
     res.json({ movies, total, pages: Math.ceil(total / limit) });
+  } catch (err) {
+    console.error("Error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
+  }
+});
+
+// @GET /api/admin/shortfilms - All short films (including unpublished)
+router.get('/shortfilms', async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const shortfilms = await Movie.find(shortfilmTypeQuery)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+    const total = await Movie.countDocuments(shortfilmTypeQuery);
+    res.json({ movies: shortfilms, total, pages: Math.ceil(total / limit) });
   } catch (err) {
     console.error("Error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
     res.status(500).json({ message: err.message || JSON.stringify(err) });
@@ -55,18 +86,20 @@ const cpUpload = (req, res, next) => {
 router.post('/movies', cpUpload, async (req, res) => {
   try {
     const { title, titleBn, description, genre, language, releaseYear, duration, director, cast, country, quality, trailerUrl, movieUrl, isPublished, isFeatured } = req.body;
+    const { duration: parsedDuration } = validateDuration('movie', duration);
 
     if (!req.files?.poster) return res.status(400).json({ message: 'Poster is required' });
 
     const movie = await Movie.create({
+      contentType: 'movie',
       title,
       titleBn,
       description,
-      genre: Array.isArray(genre) ? genre : genre?.split(",").map((g) => g.trim()),
-      cast: Array.isArray(cast) ? cast : cast?.split(",").map((c) => c.trim()),
+      genre: parseList(genre),
+      cast: parseList(cast),
       language,
       releaseYear: parseInt(releaseYear),
-      duration: duration ? parseInt(duration) : undefined,
+      duration: parsedDuration,
       director,
       country,
       quality,
@@ -84,11 +117,50 @@ router.post('/movies', cpUpload, async (req, res) => {
   }
 });
 
+// @POST /api/admin/shortfilms - Create short film
+router.post('/shortfilms', cpUpload, async (req, res) => {
+  try {
+    const { title, titleBn, description, genre, language, releaseYear, duration, director, cast, country, quality, trailerUrl, movieUrl, isPublished, isFeatured } = req.body;
+    const durationValidation = validateDuration('shortfilm', duration);
+    if (durationValidation.error) return res.status(400).json({ message: durationValidation.error });
+
+    if (!req.files?.poster) return res.status(400).json({ message: 'Poster is required' });
+
+    const shortfilm = await Movie.create({
+      contentType: 'shortfilm',
+      title,
+      titleBn,
+      description,
+      genre: parseList(genre),
+      cast: parseList(cast),
+      language,
+      releaseYear: parseInt(releaseYear),
+      duration: durationValidation.duration,
+      director,
+      country,
+      quality,
+      trailerUrl,
+      movieUrl,
+      poster: req.files.poster[0].path,
+      backdrop: req.files.backdrop ? req.files.backdrop[0].path : "",
+      isPublished: isPublished === "true",
+      isFeatured: isFeatured === "true",
+    });
+    res.status(201).json(shortfilm);
+  } catch (err) {
+    console.error("Error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
+  }
+});
+
 // @POST /api/admin/movies/:id/upload-file - Upload movie file
 router.post('/movies/:id/upload-file', uploadMovie.single('movieFile'), async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).json({ message: 'Movie not found' });
+    if (movie.contentType === 'shortfilm' && movie.duration > MAX_SHORTFILM_DURATION) {
+      return res.status(400).json({ message: `Short film duration cannot be more than ${MAX_SHORTFILM_DURATION} minutes` });
+    }
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
     const fileSizeInMB = (req.file.size / (1024 * 1024)).toFixed(1);
@@ -107,14 +179,36 @@ router.post('/movies/:id/upload-file', uploadMovie.single('movieFile'), async (r
   }
 });
 
-// @PUT /api/admin/movies/:id - Update movie
-router.put('/movies/:id', cpUpload, async (req, res) => {
+// @GET /api/admin/movies/:id and /api/admin/shortfilms/:id - Admin detail for editing drafts
+router.get(['/movies/:id', '/shortfilms/:id'], async (req, res) => {
   try {
+    const contentType = parseContentType(req);
+    const item = await Movie.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: contentType === 'shortfilm' ? 'Short film not found' : 'Movie not found' });
+    if (contentType === 'shortfilm' && item.contentType !== 'shortfilm') return res.status(404).json({ message: 'Short film not found' });
+    if (contentType === 'movie' && item.contentType === 'shortfilm') return res.status(404).json({ message: 'Movie not found' });
+    res.json(item);
+  } catch (err) {
+    console.error("Error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
+  }
+});
+
+// @PUT /api/admin/movies/:id - Update movie
+router.put(['/movies/:id', '/shortfilms/:id'], cpUpload, async (req, res) => {
+  try {
+    const contentType = parseContentType(req);
     const movie = await Movie.findById(req.params.id);
-    if (!movie) return res.status(404).json({ message: 'Movie not found' });
+    if (!movie) return res.status(404).json({ message: contentType === 'shortfilm' ? 'Short film not found' : 'Movie not found' });
+    if (contentType === 'shortfilm' && movie.contentType !== 'shortfilm') return res.status(404).json({ message: 'Short film not found' });
+    if (contentType === 'movie' && movie.contentType === 'shortfilm') return res.status(404).json({ message: 'Movie not found' });
+
+    const durationValidation = validateDuration(contentType, req.body.duration);
+    if (durationValidation.error) return res.status(400).json({ message: durationValidation.error });
 
     const fields = ['title', 'titleBn', 'description', 'language', 'releaseYear', 'duration', 'director', 'country', 'quality', 'trailerUrl', 'movieUrl'];
     fields.forEach(f => { if (req.body[f] !== undefined) movie[f] = req.body[f]; });
+    if (req.body.duration !== undefined) movie.duration = durationValidation.duration;
 
     if (req.body.genre) movie.genre = Array.isArray(req.body.genre) ? req.body.genre : req.body.genre.split(',').map(g => g.trim());
     if (req.body.cast) movie.cast = Array.isArray(req.body.cast) ? req.body.cast : req.body.cast.split(',').map(c => c.trim());
@@ -134,10 +228,23 @@ router.put('/movies/:id', cpUpload, async (req, res) => {
 // @DELETE /api/admin/movies/:id
 router.delete('/movies/:id', async (req, res) => {
   try {
-    const movie = await Movie.findByIdAndDelete(req.params.id);
+    const movie = await Movie.findOneAndDelete({ _id: req.params.id, $or: [{ contentType: 'movie' }, { contentType: { $exists: false } }] });
     if (!movie) return res.status(404).json({ message: 'Movie not found' });
     await Review.deleteMany({ movie: req.params.id });
     res.json({ message: 'Movie deleted successfully' });
+  } catch (err) {
+    console.error("Error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    res.status(500).json({ message: err.message || JSON.stringify(err) });
+  }
+});
+
+// @DELETE /api/admin/shortfilms/:id
+router.delete('/shortfilms/:id', async (req, res) => {
+  try {
+    const shortfilm = await Movie.findOneAndDelete({ _id: req.params.id, contentType: 'shortfilm' });
+    if (!shortfilm) return res.status(404).json({ message: 'Short film not found' });
+    await Review.deleteMany({ movie: req.params.id });
+    res.json({ message: 'Short film deleted successfully' });
   } catch (err) {
     console.error("Error:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
     res.status(500).json({ message: err.message || JSON.stringify(err) });

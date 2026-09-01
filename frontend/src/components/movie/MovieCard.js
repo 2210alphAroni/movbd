@@ -1,9 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FiStar, FiDownload, FiBookmark, FiPlay } from "react-icons/fi";
+import { FiStar, FiBookmark, FiPlay } from "react-icons/fi";
 import "./MovieCard.css";
 
 const MovieCard = ({ movie, onWatchlistToggle, inWatchlist }) => {
+  const detailPath = movie.contentType === "shortfilm" ? `/shortfilms/${movie._id}` : `/movies/${movie._id}`;
   const posterUrl = movie.poster?.startsWith("/uploads")
     ? `${import.meta.env.VITE_API_URL || "https://movbd-backend.vercel.app"}${movie.poster}`
     : movie.poster ||
@@ -14,7 +15,7 @@ const MovieCard = ({ movie, onWatchlistToggle, inWatchlist }) => {
       <div className="card-poster">
         <img src={posterUrl} alt={movie.title} loading="lazy" />
         <div className="card-overlay">
-          <Link to={`/movies/${movie._id}`} className="play-btn">
+          <Link to={detailPath} className="play-btn">
             <FiPlay />
           </Link>
           {onWatchlistToggle && (
@@ -38,7 +39,7 @@ const MovieCard = ({ movie, onWatchlistToggle, inWatchlist }) => {
         </div>
       </div>
       <div className="card-info">
-        <Link to={`/movies/${movie._id}`} className="card-title">
+        <Link to={detailPath} className="card-title">
           {movie.title}
         </Link>
         <div className="card-meta">

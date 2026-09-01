@@ -5,7 +5,7 @@ import { adminAPI } from '../../utils/api';
 import AdminMovies from './AdminMovies';
 import AdminAddMovie from './AdminAddMovie';
 import AdminUsers from './AdminUsers';
-import { FiFilm, FiUsers, FiDownload, FiStar, FiTrendingUp, FiPlus, FiGrid, FiLogOut } from 'react-icons/fi';
+import { FiFilm, FiUsers, FiStar, FiTrendingUp, FiPlus, FiGrid, FiLogOut } from 'react-icons/fi';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -78,6 +78,8 @@ const AdminDashboard = () => {
     { to: '/admin', label: 'Dashboard', icon: <FiGrid />, exact: true },
     { to: '/admin/movies', label: 'Movies', icon: <FiFilm /> },
     { to: '/admin/movies/add', label: 'Add Movie', icon: <FiPlus /> },
+    { to: '/admin/shortfilms', label: 'Short Films', icon: <FiFilm /> },
+    { to: '/admin/shortfilms/add', label: 'Add Short Film', icon: <FiPlus /> },
     { to: '/admin/users', label: 'Users', icon: <FiUsers /> },
   ];
 
@@ -129,6 +131,8 @@ const AdminDashboard = () => {
             {location.pathname === '/admin' && 'Dashboard Overview'}
             {location.pathname === '/admin/movies' && 'Manage Movies'}
             {location.pathname === '/admin/movies/add' && 'Add New Movie'}
+            {location.pathname === '/admin/shortfilms' && 'Manage Short Films'}
+            {location.pathname === '/admin/shortfilms/add' && 'Add New Short Film'}
             {location.pathname === '/admin/users' && 'Manage Users'}
           </h2>
           <Link to="/home" className="btn btn-ghost btn-sm">← View Site</Link>
@@ -239,6 +243,8 @@ const AdminDashboard = () => {
                 <div className="quick-grid">
                   <Link to="/admin/movies/add" className="quick-card"><FiPlus /> Add New Movie</Link>
                   <Link to="/admin/movies" className="quick-card"><FiFilm /> Manage Movies</Link>
+                  <Link to="/admin/shortfilms/add" className="quick-card"><FiPlus /> Add Short Film</Link>
+                  <Link to="/admin/shortfilms" className="quick-card"><FiFilm /> Manage Short Films</Link>
                   <Link to="/admin/users" className="quick-card"><FiUsers /> View Users</Link>
                 </div>
               </div>
@@ -247,6 +253,9 @@ const AdminDashboard = () => {
           <Route path="/movies" element={<AdminMovies />} />
           <Route path="/movies/add" element={<AdminAddMovie />} />
           <Route path="/movies/edit/:id" element={<AdminAddMovie />} />
+          <Route path="/shortfilms" element={<AdminMovies />} />
+          <Route path="/shortfilms/add" element={<AdminAddMovie />} />
+          <Route path="/shortfilms/edit/:id" element={<AdminAddMovie />} />
           <Route path="/users" element={<AdminUsers />} />
         </Routes>
       </main>

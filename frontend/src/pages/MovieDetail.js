@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { moviesAPI, reviewsAPI, watchlistAPI } from "../utils/api";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { moviesAPI, shortfilmsAPI, reviewsAPI, watchlistAPI } from "../utils/api";
+import { getEmbedUrl } from "../utils/videoEmbed";
 import { useAuth } from "../context/AuthContext";
 import {
   FiStar,
@@ -18,6 +19,11 @@ import "./MovieDetail.css";
 
 const MovieDetail = () => {
   const { id } = useParams();
+  const location = useLocation();
+  const isShortfilm = location.pathname.startsWith("/shortfilms");
+  const contentAPI = isShortfilm ? shortfilmsAPI : moviesAPI;
+  const contentName = isShortfilm ? "short film" : "movie";
+  const contentTitle = isShortfilm ? "Short Film" : "Movie";
   const { user } = useAuth();
   const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
@@ -37,10 +43,10 @@ const MovieDetail = () => {
 
   const fetchMovie = async () => {
     try {
-      const res = await moviesAPI.getById(id);
+      const res = await contentAPI.getById(id);
       setMovie(res.data);
     } catch (err) {
-      navigate("/movies");
+      navigate(isShortfilm ? "/shortfilms" : "/movies");
     } finally {
       setLoading(false);
     }
@@ -147,7 +153,7 @@ const MovieDetail = () => {
                   }}
                   className="btn btn-primary btn-lg"
                 >
-                  <FiFilm /> Watch Movie
+                  <FiFilm /> Watch {contentTitle}
                 </button>
               )}
               {movie.trailerUrl && (
@@ -277,7 +283,7 @@ const MovieDetail = () => {
               </div>
               <textarea
                 className="form-control"
-                placeholder="Share your thoughts about this movie..."
+                placeholder={`Share your thoughts about this ${contentName}...`}
                 value={reviewForm.comment}
                 onChange={(e) =>
                   setReviewForm((prev) => ({
@@ -351,8 +357,8 @@ const MovieDetail = () => {
               ✕
             </button>
             <iframe
-              src={movie.movieUrl}
-              title="Movie"
+              src={getEmbedUrl(movie.movieUrl)}
+              title={contentTitle}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -372,7 +378,7 @@ const MovieDetail = () => {
               ✕
             </button>
             <iframe
-              src={movie.trailerUrl}
+              src={getEmbedUrl(movie.trailerUrl)}
               title="Trailer"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
